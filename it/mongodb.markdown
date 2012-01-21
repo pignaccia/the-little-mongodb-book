@@ -1,33 +1,36 @@
 \thispagestyle{empty}
 \changepage{}{}{}{-1.5cm}{}{2cm}{}{}{}
-![The Little MongoDB Book, By Karl Seguin](title.png)\ 
+![Il Piccolo Libro su MongoDB, di Karl Seguin](title.png)\ 
 
 \clearpage
 \changepage{}{}{}{1.5cm}{}{-2cm}{}{}{}
 
-## About This Book ##
+## Note sul Libro ##
 
-### License ###
-The Little MongoDB Book book is licensed under the Attribution-NonCommercial 3.0 Unported license. **You should not have paid for this book.**
+### Licenza ###
+I contenuti del Piccolo Libro su MongoDB sono protetti da licenza Attribuzione - Non Commerciale 3.0. **Non dovresti aver pagato per questo libro**
 
-You are basically free to copy, distribute, modify or display the book. However, I ask that you always attribute the book to me, Karl Seguin and do not use it for commercial purposes.
+Sei libero di copiare, distribuire, modificare o mostrare il libro. Tuttavia ti chiedo di attribuire sempre l'opera all'autore, Karl Seguin, e di non usarla per scopi commerciali.
 
-You can see the full text of the license at:
+Puoi consultare il testo integrale della licenza a questo indirizzo:
 
 <http://creativecommons.org/licenses/by-nc/3.0/legalcode>
 
-### About The Author ###
-Karl Seguin is a developer with experience across various fields and technologies. He's an expert .NET and Ruby developer.  He's a semi-active contributor to OSS projects, a technical writer and an occasional speaker. With respect to MongoDB, he was a core contributor to the C# MongoDB library NoRM, wrote the interactive tutorial [mongly](http://mongly.com) as well as the [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). His free service for casual game developers, [mogade.com](http://mogade.com/), is powered by MongoDB.
+### Informazioni sull'Autore ###
+Karl Seguin è uno sviluppatore competente in diversi campi e tecnologie. E' esperto programmatore .NET e Ruby. Collabora saltuariamente a progetti OSS, è uno scrittore tecnico e occasionalmente uno speaker. Per quanto riguarda MongoDB, è stato tra i principali autori della libreria C# per MongoDB NoRM, ha scritto il tutorial interattivo [moongly](http://mongly.com) nonché [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). Il suo servizio per sviluppatori di casual game, [mogade](http://mogade.com/) gira sotto MongoDB.
 
-His blog can be found at <http://openmymind.net>, and he tweets via [@karlseguin](http://twitter.com/karlseguin)
+Il suo blog si trova su <http://openmymind.net>, e twitta come [@karlseguin](http://twitter.com/karlseguin)
 
-### With Thanks To ###
-A special thanks to [Perry Neal](http://twitter.com/perryneal) for lending me his eyes, mind and passion. You provided me with invaluable help. Thank you.
+### Ringraziamenti ###
+Un grazie speciale a [Perry Neal](http://twitter.com/perryneal) per avermi prestato occhi, mente e passione. Mi hai dato un aiuto prezioso. Grazie.
 
-### Latest Version ###
-The latest source of this book is available at: 
+### Ultima Versione ###
+L'ultima versione del sorgente di questo libro è disponibile qui:
 
 <http://github.com/karlseguin/the-little-mongodb-book>.
+
+### Traduzione italiana ###
+La traduzione italiana di questo libro è curata da [Nicola Iarocci](http://nicolaiarocci.com).
 
 \clearpage
 
