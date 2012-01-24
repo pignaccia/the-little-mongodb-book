@@ -47,34 +47,34 @@ Detto questo, prima di tutto dobbamo capirci su cosa si intenda per NoSQL. E' un
 
 Vi potreste domandare qual'è il ruolo di MongoDB in tutto questo. In quanto database orientato ai documenti Mongo è una soluzione NoSQL piuttosto generalizzata, e dovrebbe essere visto come alternativa ai database relazionali. Come i database relazionali anche Mongo potrebbe trarre beneficio dall'abbinamento a soluzioni NoSQL più specializzate. MongoDB ha vantaggi e svantaggi che vedremo nei successivi capitoli di questo libro.
 
-As you may have noticed, we use the terms MongoDB and Mongo interchangeably.
+Come avrai notato in questo libro usiamo indifferentemente i termini MongoDB e Mongo.
 
-## Getting Started ##
-Most of this book will focus on core MongoDB functionality. We'll therefore rely on the MongoDB shell. While the shell is useful to learn as well as being a useful administrative tool, your code will use a MongoDB driver.
+## Come Iniziare ##
+Gran parte di questo libro è dedicata alla funzionalità di base di MongoDB. Per questo motivo ci affideremo alla shell di MongoDB. La shell è utile sia per imparare che come strumento di amministrazione, tuttavia è il tuo codice userà uno dei tanti driver MongoDB.
 
-This does bring up the first thing you should know about MongoDB: its drivers. MongoDB has a [number of official drivers](http://www.mongodb.org/display/DOCS/Drivers) for various languages. These drivers can be thought of as the various database drivers you are probably already familiar with. On top of these drivers, the development community has built more language/framework-specific libraries. For example, [NoRM](https://github.com/atheken/NoRM) is a C# library which implements LINQ, and [MongoMapper](https://github.com/jnunemaker/mongomapper) is a Ruby library which is ActiveRecord-friendly. Whether you choose to program directly against the core MongoDB drivers or some higher-level library is up to you. I point this out only because many people new to MongoDB are confused as to why there are both official drivers and community libraries - the former generally focuses on core communication/connectivity with MongoDB and the latter with more language and framework specific implementations.
+Una delle prime cose che devi conoscere su MongoDB sono i suoi drivers. Mongo ha una certa dotazione di [driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers), adatti ai diversi linguaggi di programmazione. Puoi considerare questi driver simili ai driver per database che probabilmente hai già usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQU, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base oppure con una delle libreria di più alto livello è libera. Ne parlo solo perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza dei driver ufficiali e delle librerie della communit - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework.
 
-As you read through this, I encourage you to play with MongoDB to replicate what I demonstrate as well as to explore questions that might come up on your own. It's easy to get up and running with MongoDB, so let's take a few minutes now to set things up. 
+Durante la lettura del libro ti invito a giocare con MongoDB, mettendo in pratica quel che propongo ed anche sperimentando per conto tuo, rispondendo alle domande che senz'altro ti farai. E' facile cominciare a lavorare con MongoDB, quindi diamoci subito da fare e cominciamo configurando quel che ci serve.
 
-1. Head over to the [official download page](http://www.mongodb.org/downloads) and grab the binaries from the first row (the recommended stable version) for your operating system of choice. For development purposes, you can pick either 32-bit or 64-bit.
+1. Vai alla [pagina di download ufficiale](http://www.mongodb.org/downloads) è scarica i file binari per il tuo sistema operativo (scegli la versione stabile raccomandata). Ai fini dello sviluppo puoi prelevare indifferentemente la versione a 32-bit o 64-bit.
 
-2. Extract the archive (wherever you want) and navigate to the `bin` subfolder. Don't execute anything just yet, but know that `mongod` is the server process and `mongo` is the client shell - these are the two executables we'll be spending most of our time with. 
+2. Scompatta l'archvio (non importa la posizione) quindi vai alla cartella `bin`. Non eseguire nulla, ma sappi che `mongod` è il processo server mentre `mongo` è la shell (il client) - questi sono i due eseguibili coi quali passeremo gran parte del nostro tempo.
 
-3. Create a new text file in the `bin` subfolder named `mongodb.config`
+3. Crea un nuovo file di testo nella cartella `bin` e chiamalo `mongodb.config`.
 
-4. Add a single line to your mongodb.config: `dbpath=PATH_TO_WHERE_YOU_WANT_TO_STORE_YOUR_DATABASE_FILES`. For example, on Windows you might do `dbpath=c:\mongodb\data` and on Linux you might do `dbpath=/etc/mongodb/data`. 
+4. Aggiungi questa riga al tuo mongodb.config: dbpath=PERCORSO_DOVE_VUOI_SALVARE_IL_TUO_DATABASE`. Ad esempio, su Windows potresti scegliere `dbpath=c:\mongodb\data` mentre su Linux una scelta valida potrebbe essere `dbpath=/etc/mongodb/data`.
 
-5. Make sure the `dbpath` you specified exists
+5. Assicurati che il `dbpath` che hai indicato esista.
 
-6. Launch mongod with the `--config /path/to/your/mongodb.config` parameter.
+6. Lancia mongod con l'opzione `--config /path/to/your/mongodb.config`.
 
-As an example for Windows users, if you extracted the downloaded file to `c:\mongodb\` and you created `c:\mongodb\data\` then within `c:\mongodb\bin\mongodb.config` you would specify `dbpath=c:\mongodb\data\`. You could then launch `mongod` from a command prompt via `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
+Ad esmepio, un utente Windows potrebbe aver estratto il file scaricato in `c:\mongodb\` e aver creato la cartella `c:\mongodb\data\`. In questo caso all'interno di `c:\mongodb\bin\mongodb.config` dovrà specificare `dbpath=c:\mongodb\data\`. A questo punto può lanciare `mongod` dalla linea di comando con `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
 
-Feel free to add the `bin` folder to your path to make all of this less verbose. MacOSX and Linux users can follow almost identical directions. The only thing you should have to change are the paths.
+Naturalmente puoi aggiungere la cartella `bin` al tuo PATH per rendere tutto più facile. Tutto questo è valido anche per gli utenti MacOSX e Linux, che probabilmente dovranno adattare i percorsi.
 
-Hopefully you now have MonogDB up and running. If you get an error, read the output carefully - the server is quite good at explaining what's wrong.
+A questo punto dovresti trovari con MongoDB pronto e operativo. Se invece ottieni un messaggio di errore, leggi con attenzione l'output - il server è piuttosto bravo a spiegare cos'è andato storto.
 
-You can now launch `mongo` (without the *d*) which will connect a shell to your running server. Try entering `db.version()` to make sure everything's working as it should. Hopefully you'll see the version number you installed.
+Puoi lanciare `mongo` (senza la *d*) che connetterà la shell al tuo server in esecuzione. Prova a digitare `db.version()` per assicurarti che tutto sta funzionando come si deve. Dovresti vedere il numero della versione che hai installato.
 
 \clearpage
 
