@@ -68,7 +68,7 @@ Durante la lettura del libro ti invito a giocare con MongoDB, mettendo in pratic
 
 6. Lancia mongod con l'opzione `--config /path/to/your/mongodb.config`.
 
-Ad esmepio, un utente Windows potrebbe aver estratto il file scaricato in `c:\mongodb\` e aver creato la cartella `c:\mongodb\data\`. In questo caso all'interno di `c:\mongodb\bin\mongodb.config` dovrà specificare `dbpath=c:\mongodb\data\`. A questo punto può lanciare `mongod` dalla linea di comando con `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
+Ad esempio un utente Windows potrebbe estrarre il file scaricato in `c:\mongodb\` e creare la cartella `c:\mongodb\data\`. In questo caso all'interno di `c:\mongodb\bin\mongodb.config` dovrà specificare `dbpath=c:\mongodb\data\`. A questo punto può lanciare `mongod` dalla linea di comando con `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
 
 Naturalmente puoi aggiungere la cartella `bin` al tuo PATH per rendere tutto più facile. Tutto questo è valido anche per gli utenti MacOSX e Linux, che probabilmente dovranno adattare i percorsi.
 
@@ -78,61 +78,64 @@ Puoi lanciare `mongo` (senza la *d*) che connetterà la shell al tuo server in e
 
 \clearpage
 
-## Chapter 1 - The Basics ##
-We begin our journey by getting to know the basic mechanics of working with MongoDB. Obviously this is core to understanding MongoDB, but it should also help us answer higher-level questions about where MongoDB fits.
+## Capitolo 1 - Le Basi ##
+Cominciamo il nostro viaggio imparando i meccanismi base di MongoDB. Ovviamente sono fondamentali per capire MongoDB, ma a un livello più generale ci aiuterannoa rispondere alle nostre domande sul ruolo stesso di MongoDB.
 
-To get started, there are six simple concepts we need to understand.
+Per cominciare, ci sono sei semplici concetti che dobbiamo comprendere.
 
-1. MongoDB has the same concept of a 'database' with which you are likely already familiar (or a schema for you Oracle folks).  Within a MongoDB instance you can have zero or more databases, each acting as high-level containers for everything else.
+1. MongoDB implementa lo stesso concetto di 'database' al quale probabilmente siete abituati (o schema, se venite dal mondo Oracle). All'interno di una istanza MongoDB potete avere zero o più database, ognuno dei quali agisce come un contenitore di alto livello per tutto il resto.
 
-2. A database can have zero or more 'collections'. A collection shares enough in common with a traditional 'table' that you can safely think of the two as the same thing.
+2. Un database può avere zero o più 'collezioni'. Una collezione ha molto in comune con le 'tabelle' tradizionali, tanto che potete considerarle la stessa cosa.
 
-3. Collections are made up of zero or more 'documents'. Again, a document can safely be thought of as a 'row'.
+3. Le collezioni sono composte da zero o più 'documenti'. Di nuovo, potete pensare a un documento come a una 'riga' (record) di una tabella.
 
-4. A document is made up of one or more 'fields', which you can probably guess are a lot like 'columns'.
+4. Un documento è a sua volta composto da uno o più 'campi', che come potete immaginare assomigliano alle 'colonne'.
 
-5. 'Indexes' in MongoDB function much like their RDBMS counterparts.
+5. Gli 'indici' in MongoDB funzionano in modo molto simile alle loro controparti RDBMS.
 
-6. 'Cursors' are different than the other five concepts but they are important enough, and often overlooked, that I think they are worthy of their own discussion.  The important thing to understand about cursors is that when you ask MongoDB for data, it returns a cursor, which we can do things to, such as counting or skipping ahead, without actually pulling down data.
+6. I 'cursori', a cui spesso viene data poca importanza, sono qualcosa di diverso dagli altri cinque concetti, e li ritengo abbastanza importanti da meritare attenzione. E' importante sapere che quando si chiedono dati a MongoDB questi restituisce un cursore col quale possiamo, per esempio, contare i documenti o spostarci avanti, senza che alcun dato venga effettivamente letto.
 
-To recap, MongoDB is made up of `databases` which contain `collections`. A `collection` is made up of `documents`. Each `document` is made up of `fields`. `Collections` can be `indexed`, which improves lookup and sorting performance. Finally, when we get data from MongoDB we do so through a `cursor` whose actual execution is delayed until necessary.
+Riassumendo, MongoDB è fatto di 
 
-You might be wondering, why use new terminology (collection vs. table, document vs. row and field vs. column). Is it just to make things more complicated? The truth is that while these concepts are similar to their relational database counterparts, they are not identical. The core difference comes from the fact that relational databases define `columns` at the `table` level whereas a document-oriented database defines its `fields` at the `document` level. That is to say that each `document` within a `collection` can have its own unique set of `fields`.  As such, a `collection` is a dumbed down container in comparison to a `table`, while a `document` has a lot more information than a `row`.
 
-Although this is important to understand, don't worry if things aren't yet clear. It won't take more than a couple of inserts to see what this truly means. Ultimately, the point is that a collection isn't strict about what goes in it (it's schema-less). Fields are tracked with each individual document. The benefits and drawbacks of this will be explored in a future chapter.
+Riassumendo, MongoDB è fatto di `database` che contengono `collezioni`. Una `collezione` è una raccolta di `documenti`. Ogni `documento` è composto da `campi`. Le `collezioni` possono essere `indicizzate`, il che migliora le prestazioni delle ricerche e degli ordinamenti. Infine, quando chiediamo dati a MongoDB otteniamo un `cursore` la cui esecuzione è rinviata finché non si rende necessaria.
 
-Let's get hands-on. If you don't have it running already, go ahead and start the `mongod` server as well as a mongo shell. The shell runs JavaScript. There are some global commands you can execute, like `help` or `exit`. Commands that you execute against the current database are executed against the `db` object, such as `db.help()` or `db.stats()` . Commands that you execute against a specific collection, which is what we'll be doing a lot of, are executed against the `db.COLLECTION_NAME` object, such as `db.unicorns.help()` or `db.unicorns.count()`.
+Vi potreste domandare per quale ragione adottiamo una nuova terminologia (collezione invece di tabella, documento al posto di riga e campo piuttosto che colonna). Vogliamo solo complicare le cose? La verità è che questi nuovi concetti non sono identici alle loro controparti nei database relazionali. La differenza più importante è che i database relazionali definiscono le `colonne` a livello `tabella` mentre i database orientati ai documenti definiscono i `campi` a livello di `documento`. Ciò significa che ogni `documento` di una `collezione` può avere il suo set esclusivo di `campi`. Ne consegue che una `collezione` è un contenitore più semplice di una `tabella`, laddove un `documento` ha molte più informazioni di una `riga`.
 
-Go ahead and enter `db.help()`, you'll get a list of commands that you can execute against the `db` object.
+Si tratta di una cosa importante da capire, ma non c'è da preoccuparsi se il concetto non è ancora chiaro. Basteranno un paio di inserimenti per capire il vero significato di tutto questo. In definitiva una collezione non vincola il suo contenuto (è senza schema, o schema-less). I campi vengono tracciati in ogni singolo documento. Esploreremo vantaggi e svantaggi di tutto questo in uno dei prossimi capitoli.
 
-A small side note. Because this is a JavaScript shell, if you execute a method and omit the parentheses `()`, you'll see the method body rather than executing the method. I only mention it because the first time you do it and get a response that starts with `function (...){` you won't be surprised. For example, if you enter `db.help` (without the parentheses), you'll see the internal implementation of the `help` method.
+Cominciamo a darci da fare. Se ancora non l'avete fatto eseguite pure il server `mongod` e la mongo shell. La shell esegue codice JavaScript. Ci sono alcuni comandi globali che potete lanciare, come `help` o `exit`. I comandi lanciati nei confronti del database attivo si eseguono nei confronti dell'oggetto `db`, come ad esempio `db.help()` o `db.stats()`. I comandi lanciati nei confronti una collezione specifica, cosa che avviene spesso, vanno eseguiti nei confronti dell'oggetto `db.NOME_COLLEZIONE`, come per esempio `db.unicorns.help()` oppure `db.unicorns.count()`.
 
-First we'll use the global `use` method to switch databases, go ahead and enter `use learn`. It doesn't matter that the database doesn't really exist yet. The first collection that we create will also create the actual `learn` database. Now that you are inside a database, you can start issuing database commands, like `db.getCollectionNames()`. If you do so, you should get an empty array (`[ ]`). Since collections are schema-less, we don't explicitly need to create them. We can simply insert a document into a new collection. To do so, use the `insert` command, supplying it with the document to insert:
+Provate a digitare `db.help()`. Otterrete una lista dei comandi che è possibile eseguire nei confornti dell'oggetto `db`.
+
+Piccola nota a margine. Poiché questa è una shell JavaScript, se eseguite un metodo e omettete le parentesi `()`, vedrete il contenuto del metodo piuttosto che ottenerne l'esecuzione. Ve lo ricordo affinché la prima volta che vi capiterà di farlo e di vedere una risposta che comincia con `function (...){` non rimaniate sorpresi. Per esempio se inserite `db.help` (senza le parentesi) quello che otterrete è la visualizzazione dell'implementazione interna del metodo `help`.
+
+Prima di tutto useremo il metodo globale `use` per cambiare il database attivo. Digitate `use learn`. Non importa che il database non esista ancora. Quando creeremo la prima collezione, allora verrà creato anche il database `learn`. Ora che abbiamo un database attivo possiamo eseguire comandi sul database stesso, come per esempio `db.getCollectionNames()`. Se lo fate dovreste ottenere un array vuoto (`[ ]`). Poiché le collezioni sono schema-less non c'è necessità di crearle esplicitamente. Possiamo semplicemente inserire un documento nella nuova collezione. Per farlo usiamo il comando `insert`, passandogli direttamente il documento da inserire:
 
 	db.unicorns.insert({name: 'Aurora', gender: 'f', weight: 450})
 
-The above line is executing `insert` against the `unicorns` collection, passing it a single argument. Internally MongoDB uses a binary serialized JSON format. Externally, this means that we use JSON a lot, as is the case with our parameters. If we execute `db.getCollectionNames()` now, we'll actually see two collections: `unicorns` and `system.indexes`. `system.indexes` is created once per database and contains the information on our databases index. 
+La riga esegue il comando `insert` nei confronti della collezione `unicorns`, passandogli un singolo argomento. Per la serializzazione MongoDB usa internamente il formato JSON binario. Esternamente ciò significa che useremo parecchio JSON, come nel caso dei nostri parametri. Se ora eseguiamo `db.getCollectionNames()` otteniamo due collezioni: `unicorns` e `system.indexes`. `system.indexes` viene creata una volta per database, e contiene informazioni sugli indici del database.
 
-You can now use the `find` command against `unicorns` to return a list of documents:
+Ora possiamo usare il comando `find` sulla collezione `unicorns` per ottenere una lista di documenti:
 
 	db.unicorns.find()
 
-Notice that, in addition to the data you specified, there's an `_id` field. Every document must have a unique `_id` field. You can either generate one yourself or let MongoDB generate an ObjectId for you. Most of the time you'll probably want to let MongoDB generate it for you. By default, the `_id` field is indexed - which explains why the `system.indexes` collection was created. You can look at `system.indexes`:
+Notate che in aggiunta ai dati che avete specificato c'è un campo `_id`. Ogni documento deve avere un campo `_id` univoco. Potete generarlo da voi oppure lasciare che sia MongoDB a generare un ObjectId per voi. Probabilmente la maggior parte delle volte sarà sufficiente lasciarlo generare a MongoDB. Per impostazione predefinita il campo `_id` è indicizzato - il che spiega l'esistenza della collezione `system.indexes`. E' possibile consultare l'elenco degli indici:
 
 	db.system.indexes.find()
 
-What you're seeing is the name of the index, the database and collection it was created against and the fields included in the index.
+Ciò che otteniamo è il nome dell'indice, il database e la collezione nel quale è stato creato e l'elenco dei campi inclusi nell'indice.
 
-Now, back to our discussion about schema-less collections. Insert a totally different document into `unicorns`, such as:
+Torniamo alla nostra discussione sulle collezioni schema-less. Inseriamo un documento completamente diverso nella collezione `unicorns`:
 
 	db.unicorns.insert({name: 'Leto', gender: 'm', home: 'Arrakeen', worm: false})
 
-And, again use `find` to list the documents. Once we know a bit more, we'll discuss this interesting behavior of MongoDB, but hopefully you are starting to understand why the more traditional terminology wasn't a good fit.
+Usiamo di nuovo `find` per vedere la lista dei documenti. Quando sapremo qualcosa in più discuteremo questo interessante comportamento di MongoDB, ma a questo punto dovreste cominciare a comprendere perché la terminologia tradizionale non è più adeguata.
 
-### Mastering Selectors ###
-In addition to the six concepts we've explored, there's one practical aspect of MongoDB you need to have a good grasp of before moving to more advanced topics: query selectors. A MongoDB query selector is like the `where` clause of an SQL statement. As such, you use it when finding, counting, updating and removing documents from collections. A selector is a JSON object , the simplest of which is `{}` which matches all documents (`null` works too). If we wanted to find all female unicorns, we could use `{gender:'f'}`.
+### Padroneggiare i Selettori ###
+Oltre ai sei concetti già visti c'è un aspetto pratico di MongoDB che è necessario comprendere a fondo prima di poter continuare con argomenti più avanzati: i selettori di query (query selectors). Un selettore di query in MongoDB assomiglia alla clausola `where` di un comando SQL. In quanto tale viene usato per trovare, contare, aggiornare e rimuovere documenti dalle collezioni. Un selettore è un oggetto JSON la cui forma più semplice è `{}` che rintraccia tutti i documenti (`null` è altrettando valido). Se volessimo trovare tutti gli unicorni femmina potremmo usare `{gender:'f'}`.
 
-Before delving too deeply into selectors, let's set up some data to play with. First, remove what we've put so far in the `unicorns` collection via: `db.unicorns.remove()` (since we aren't supplying a selector, it'll remove all documents). Now, issue the following inserts to get some data we can play with (I suggest you copy and paste this):
+Prima di addentrarci a fondo nei selettori prepariamo un po' di dati con cui giocare. Prima di tutto cancellerriamo ciò che abbiamo inserito finora nella collezione `unicorns`: `db.unicorns.remove()` (poiché non stiamo fornendo un selettore, rimuoveremo tutti i documenti). Ora digitiamo i comandi di inserimento seguenti, così da ottenere un po' di dati con cui lavorare (suggerisco di copiare e incollare da qui):
 
 	db.unicorns.insert({name: 'Horny', dob: new Date(1992,2,13,7,47), loves: ['carrot','papaya'], weight: 600, gender: 'm', vampires: 63});
 	db.unicorns.insert({name: 'Aurora', dob: new Date(1991, 0, 24, 13, 0), loves: ['carrot', 'grape'], weight: 450, gender: 'f', vampires: 43});
@@ -147,34 +150,34 @@ Before delving too deeply into selectors, let's set up some data to play with. F
 	db.unicorns.insert({name: 'Nimue', dob: new Date(1999, 11, 20, 16, 15), loves: ['grape', 'carrot'], weight: 540, gender: 'f'});
 	db.unicorns.insert({name: 'Dunx', dob: new Date(1976, 6, 18, 18, 18), loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165});
 
-Now that we have data, we can master selectors. `{field: value}` is used to find any documents where `field` is equal to `value`. `{field1: value1, field2: value2}` is how we do an `and` statement. The special `$lt`, `$lte`, `$gt`, `$gte` and `$ne` are used for less than, less than or equal, greater than, greater than or equal and not equal operations. For example, to get all male unicorns that weigh more than 700 pounds, we could do:
+Ora che abbiamo i dati possiamo fare pratica coi selettori. Usiamo `{campo: valore}` per trovare documenti il cui `campo` sia uguale a `valore`. Usiamo `{field1: value1, field2: value2}` per indicare l'operatore `and`. Usiamo `$lt`, `$lte`, `$gt`, `$gte` e `$ne` come operatori minore di (less than), minore o uguale (less than or equale), maggiore di (greater than), maggiore o uguale (greater then or equal) e diverso da (not equal). Per esempio, per ottenere tutti gli unicorni maschi che pesano più di 700 libbre possamo usare:
 
 	db.unicorns.find({gender: 'm', weight: {$gt: 700}})
-	//or (not quite the same thing, but for demonstration purposes)
+	//oppure (non è la scelta migliore, ma vale come esempio)
 	db.unicorns.find({gender: {$ne: 'f'}, weight: {$gte: 701}})
 
-The `$exists` operator is used for matching the presence or absence of a field, for example:
+L'operatore `$exists` è usato per verificare la presenza o l'assenza di un campo, per esempio:
 
 	db.unicorns.find({vampires: {$exists: false}})
 
-Should return a single document. If we want to OR rather than AND we use the `$or` operator and assign it to an array of values we want or'd:
+Dovrebbe restituire un singolo documento. Se vogliamo un OR invece di un AND usiamo l'operatore `$or` assegnandoli un array di valori sui quali vogliamo compiere l'OR:
 
 	db.unicorns.find({gender: 'f', $or: [{loves: 'apple'}, {loves: 'orange'}, {weight: {$lt: 500}}]})
 
-The above will return all female unicorns which either love apples or oranges or weigh less than 500 pounds.
+Questa istruzione restituisce tutti gli unicorni femmina che amano le mele (apple), le arance (orange) oppure che pesano (weight) meno di 500 librre.
 
-There's something pretty neat going on in our last example. You might have already noticed, but the `loves` field is an array. MongoDB supports arrays as first class objects. This is an incredibly handy feature. Once you start using it, you wonder how you ever lived without it. What's more interesting is how easy selecting based on an array value is: `{loves: 'watermelon'}` will return any document where `watermelon` is a value of `loves`.
+Nell'ultimo esempio succede qualcosa di interessante. Forse avrete notato che il campo `loves` è un array. MongoDB supporta gli array come oggetti di prima classe. Questa è una caratteristica incredibilmente utile. Una volta cominciato ad usarla ti domanderai come hai potuto vivere senza finora. Ciò che è ancor più interessante è quanto sia facile fare selezioni basate su un valore array: `{loves: 'watermelon'}` restituisce qualunque documento che abbia campi 'loves' valorizzati a 'watermelon'.
 
-There are more available operators than what we've seen so far. The most flexible being `$where` which lets us supply JavaScript to execute on the server. These are all described in the [Advanced Queries](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries) section of the MongoDB website. What we've covered so far though is the basics you'll need to get started. It's also what you'll end up using most of the time.
+Sono disponibili più operatori di quelli che abbiamo visto finora. Il più flessibile è `$where`, il quale ci permette di passare codice JavaScript da eseguire sul server. Questi operatori sono discussi nella sezione [Advanced Queries](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries) del sito di MongoDB. Quel che abbiamo visto finora è sufficiente per cominciare con MongoDB, ed è anche ciò che userete per la maggior parte del tempo.
 
-We've seen how these selectors can be used with the `find` command. They can also be used with the `remove` command which we've briefly looked at, the `count` command, which we haven't looked at but you can probably figure out, and the `update` command which we'll spend more time with later on.
+Abbiamo visto come i selettori possano essere usati col comando `find`. Possono essere adoperati anche con `remove`, già incontrato brevemente, `count`, che ancora non abbiamo ancora ma che potete intuire da soli, e col comando `update` a cui ci dedicheremo in seguito.
 
-The `ObjectId` which MongoDB generated for our `_id` field can be selected like so:
+Il `ObjectId` che MongoDB ha generato per il nostro campo `_id` puà a sua volta essere selezionato:
 
 	db.unicorns.find({_id: ObjectId("TheObjectId")})
 
-### In This Chapter ###
-We haven't looked at the `update` command yet, or some of the fancier things we can do with `find`. However, we did get MongoDB up and running, looked briefly at the `insert` and `remove` commands (there isn't much more than what we've seen). We also introduced `find` and saw what MongoDB `selectors` were all about. We've had a good start and laid a solid foundation for things to come. Believe it or not, you actually know most of what there is to know about MongoDB - it really is meant to be quick to learn and easy to use. I strongly urge you to play with your local copy before moving on. Insert different documents, possibly in new collections, and get familiar with different selectors. Use `find`, `count` and `remove`. After a few tries on your own, things that might have seemed awkward at first will hopefully fall into place.
+### In Questo Capitolo ###
+Non abbiamo ancora studiato il comando `update`, o visto alcune delle cose più carine che possiamo fare con `find`. Tuttavia abbiamo fatto partire MongoDB, abbiamo dato una occhiata ai comandi `inset` e `remove` (su questi non c'è molto altro da aggiungere). Abbiamo introdotto `find` e scoperto che cosa sono i 'selectors' (selettori) in MongoDB. Siamo partiti col piede giusto impostando le basi per quel che deve ancora venire. Che ci crediate o no, a questo punto conoscete la maggior parte di quel che serve sapere per usare MongoDB - è davvero progettato per essere facile e veloce da imparare e usare. Vi invito caldamente a giocare con la vostra copia locale prima di proseguire. Inserite documenti diversi, possibilmente in nuove collezioni, e prendete confidenza con i vari selettori. Usate `find`, `find` e `remove`. Dopo pochi tentativi ciò che ora può sembrare poco chiaro finira probabilmente per avere senso.
 
 \clearpage
 
