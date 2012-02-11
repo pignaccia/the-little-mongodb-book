@@ -706,7 +706,7 @@ In questo capitolo abbiamo scoperto vari comandi, strumenti e dettagli sulla per
 
 \clearpage
 
-## Conclusion ##
-You should have enough information to start using MongoDB in a real project. There's more to MongoDB than what we've covered, but your next priority should be putting together what we've learned, and getting familiar with the driver you'll be using. The [MongoDB website](http://www.mongodb.com/) has a lot of useful information. The official [MongoDB user group](http://groups.google.com/group/mongodb-user) is a great place to ask questions.
+## Conclusione ##
+Ora dovreste essere in possesso di informazioni sufficienti per usare MongoDB in un vero progetto. C'è di più da dire rispetto a quel che abbiamo trattato, ma la priorità ora dovrebbe essere mettere insieme tutto quel che abbiamo imporato e prendere familiarità con il driver che userete. Il [sito MongoDB](http://www.mongodb.com/) è ricco di informazioni utili e il [MongoDB user group ufficiale](http://groups.google.com/group/mongodb-user) è il posto ideale dove fare domande..
 
-NoSQL was born not only out of necessity, but also out of an interest to try new approaches. It is an acknowledgement that our field is ever advancing and that if we don't try, and sometimes fail, we can never succeed. This, I think, is a good way to lead our professional lives.
+NoSQL è nato non solo per necessità, ma anche dall'interesse nel sperimentare nuovi approcci. E' un dato di fatto che il nostro settore è in continua evoluzione, e che se non tentiamo, a votle fallendo, non otteremo alcun successo. Credo che questo possa essere un buon sistema per condurre la nostra vita professionale.
