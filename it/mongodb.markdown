@@ -1,4 +1,4 @@
-	\thispagestyle{empty}
+\thispagestyle{empty}
 \changepage{}{}{}{-1.5cm}{}{2cm}{}{}{}
 ![Il Piccolo Libro su MongoDB, di Karl Seguin](title.png)\ 
 
@@ -17,9 +17,9 @@ Puoi consultare il testo integrale della licenza a questo indirizzo:
 <http://creativecommons.org/licenses/by-nc/3.0/legalcode>
 
 ### Informazioni sull'Autore ###
-Karl Seguin è uno sviluppatore competente in diversi campi e tecnologie. E' esperto programmatore .NET e Ruby. Collabora saltuariamente a progetti OSS, è uno scrittore tecnico e occasionalmente uno speaker. Per quanto riguarda MongoDB, è stato tra i principali autori della libreria C# per MongoDB NoRM, ha scritto il tutorial interattivo [moongly](http://mongly.com) nonché [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). Il suo servizio per sviluppatori di casual game, [mogade](http://mogade.com/) gira sotto MongoDB.
+Karl Seguin è uno sviluppatore competente in diversi campi e tecnologie. E' esperto programmatore .NET e Ruby. Collabora saltuariamente a progetti OSS, è scrittore tecnico e, occasionalmente, speaker. Per quanto riguarda MongoDB è stato tra i principali autori della libreria C# per MongoDB, NoRM. Ha scritto il tutorial interattivo [moongly](http://mongly.com) nonché [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). Il suo servizio per sviluppatori di casual games, [mogade](http://mogade.com/) gira con MongoDB.
 
-Il suo blog si trova su <http://openmymind.net>, e twitta come [@karlseguin](http://twitter.com/karlseguin)
+Il suo blog è <http://openmymind.net>, e twitta come [@karlseguin](http://twitter.com/karlseguin)
 
 ### Ringraziamenti ###
 Un grazie speciale a [Perry Neal](http://twitter.com/perryneal) per avermi prestato occhi, mente e passione. Mi hai dato un aiuto prezioso. Grazie.
@@ -30,60 +30,60 @@ L'ultima versione del sorgente di questo libro è disponibile qui:
 <http://github.com/karlseguin/the-little-mongodb-book>.
 
 ### Traduzione italiana ###
-La traduzione italiana di questo libro è curata da [Nicola Iarocci](http://nicolaiarocci.com).
+La traduzione italiana del libro è curata da [Nicola Iarocci](http://nicolaiarocci.com). Vi prego di segnalare ogni errore o imprecisione, così da migliorare la qualità della traduzione nel tempo.
 
 \clearpage
 
 ## Introduzione ##
- > Non è colpa mia se i capitolo sono brevi, MongoDB è davvero semplice da imparare.
+ > Non è colpa mia se i capitoli sono brevi, MongoDB è davvero così semplice da imparare.
 
-Si dice spesso che la tecnologia avanza a velocità impressionante. E' vero che la lista delle nuove tecnologie e tecniche è in continua crescita. Tuttavia da tempo sono convinto che le tecnologie fondamentali per i programmatori evolvano a un ritmo più lento. Una persona potrebbe trascorrere anni senza imparare granché restando competente. Impressiona piuttosto la velocità con cui tecnologie consolidate vengono sostituite da altre. Da un giorno all'altro tecnologie ormai affermate si ritrovano minacciate da un repentino spostamento dell'attenzione del programmatore.
+Si dice spesso che la tecnologia avanza a velocità impressionante. E' vero che la lista di nuove tecnologie e tecniche da imparare è in continua crescita. Tuttavia sono convinto da tempo che le tecnologie fondamentali usate dai programmatori evolvono a un ritmo piuttosto ento. Una persona potrebbe passare anni senza imparare granché e tuttavia rimanere competente. Impressiona, piuttosto, la velocità con cui le tecnologie consolidate vengono rimpiazzate. Apparentemente da un giorno all'altro, tecnologie affermate sono messe in discussione da un repentino cambiamento di attenzione da parte dei programmatori.
 
-Il fenomeno è evidente nel progresso che le tecnologie NoSQL stanno compiendo rispetto ai ben consolidati database relazionali. Fino a ieri il web era guidato da pochi RDBMS e oggi quattro o cinque soluzioni NoSQL si sono affermate come alternative attendibili.
+Il fenomeno è evidente nell'progresso che le tecnologie NoSQL stanno facendo nei confronti dei ben consolidati database relazionali. Fino a ieri il web era guidato da pochi RDBMS, ed ecco che oggi quattro o cinque soluzioni NoSQL sono già affermate come attendibili alternative.
 
-Anche se sembra che queste transizioni avvengano nel corso di una notte la realta è che possono passare anni prima che una nuova tecnologia diventi una pratica accettata. L'entusiasmo iniziale è guidato da un gruppo relativamente piccolo di sviluppatori e aziende. I prodotti migliorano con l'esperienza e, quando ci si rende conto che una tecnologia è destinata a persistere, altri cominciano a sperimentarla. Ciò è particolarmente vero nel caso del NoSQL poiché spesso queste soluzioni non sono progettate come alternative a modelli di storage più tradizionali, ma intendono far fronte a nuove necessità.
+Anche se sembra che queste transizioni avvengano nel corso di una notte, la realta è che possono passare anni prima che una nuova tecnologia divenga pratica comune. L'entusiasmo iniziale è guidato da un gruppo relativamente piccolo di sviluppatori e aziende. I prodotti migliorano con l'esperienza e, quando ci si rende conto che una tecnologia è destinata a rimanere, altri cominciano a sperimentarla. Ciò è particolarmente vero nel caso NoSQL poiché spesso queste soluzioni non vengono progettate come alternative a modelli di storage più tradizionali, ma intendono piuttosto far fronte a nuove necessità.
 
-Detto questo, prima di tutto dobbamo capirci su cosa si intenda per NoSQL. E' un termine vago, che ha significati diversi a seconda di chi lo usa. Personalmente intendo in senso molto ampio per indicare un sistema che ha un ruolo nel salvataggio dei dati. In altre parole per me NoSQL è la convinzione che lo strato di persistenza non è necessariamente responsabilità di un solo sistema. Laddove storicamente i fornitori di database relazionali hanno sempre tentanto di posizionare i loro software come soluzione universale per qualunque problema, NoSQL tende a individuare piccole unità di responsabilità per ognuna delle quali scegliere lo strumento ideale. Quindi uno stack NoSQL potrebbe contemplare un database relazionare, MySQL per esempio, Redis per i lookup veloci e Hadoop per le elaborazioni intensive dei dati. In parole povere NoSQL è essere aperti e coscienti dell'esistenza di pattern e strumenti alternativi per la gestione dei dati. 
+Detto questo, prima di tutto dobbamo capirci su cosa si intenda per NoSQL. E' un termine vago, che ha significati diversi a seconda di chi lo usa. Personalmente lo intendo in senso molto ampio, per far riferimento a un sistema che svolge un ruolo nel salvataggio dei dati. In altre parole per me NoSQL è la convinzione che lo strato di persistenza non è necessariamente responsabilità di un solo sistema. Laddove storicamente i fornitori di database relazionali hanno sempre tentanto di posizionare i loro software come soluzione universale per qualunque problema, NoSQL tende a individuare piccole unità di responsabilità per ognuna delle quali scegliere lo strumento ideale. Quindi uno stack NoSQL potrebbe contemplare un database relazionale, MySQL per esempio, Redis per ricerche veloci e Hadoop per le elaborazioni dati intensive. In parole povere NoSQL è essere aperti e coscienti dell'esistenza di modelli e strumenti alternativi per la gestione dei dati. 
 
-Vi potreste domandare qual'è il ruolo di MongoDB in tutto questo. In quanto database orientato ai documenti Mongo è una soluzione NoSQL piuttosto generalizzata, e dovrebbe essere visto come alternativa ai database relazionali. Come i database relazionali anche Mongo potrebbe trarre beneficio dall'abbinamento a soluzioni NoSQL più specializzate. MongoDB ha vantaggi e svantaggi che vedremo nei successivi capitoli di questo libro.
+Vi potreste domandare qual'è il ruolo ricoperto da MongoDB in tutto questo. In quanto database orientato ai documenti Mongo è una soluzione NoSQL piuttosto generalizzata, e in effetti andrebbe visto come una alternativa ai database relazionali. Come i database relazionali anche Mongo potrebbe trarre beneficio dall'abbinamento a soluzioni NoSQL più specializzate. MongoDB ha vantaggi e svantaggi che vedremo nei prossimi capitoli di questo libro.
 
-Come avrai notato in questo libro usiamo indifferentemente i termini MongoDB e Mongo.
+Avrete notato che in questo libro useremo indifferentemente i termini MongoDB e Mongo.
 
-## Come Iniziare ##
-Gran parte di questo libro è dedicata alla funzionalità di base di MongoDB. Per questo motivo ci affideremo alla shell di MongoDB. La shell è utile sia per imparare che come strumento di amministrazione, tuttavia è il tuo codice userà uno dei tanti driver MongoDB.
+## Cominciare ##
+Gran parte di questo libro è dedicata alle funzionalità di base di MongoDB. Per questo motivo ci affideremo alla shell di MongoDB. La shell è preziosa sia per imparare che come strumento di amministrazione, tuttavia il vostro codice applicativo farà uso senz'altro di uno dei driver MongoDB.
 
-Una delle prime cose che devi conoscere su MongoDB sono i suoi drivers. Mongo ha una certa dotazione di [driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers), adatti ai diversi linguaggi di programmazione. Puoi considerare questi driver simili ai driver per database che probabilmente hai già usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQU, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base oppure con una delle libreria di più alto livello è libera. Ne parlo solo perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza dei driver ufficiali e delle librerie della communit - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework.
+Questo ci porta alla prima cosa da conoscere diMongoDB: i driver. Mongo è dotati di un [buon numero di driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers) per i principali linguaggi di programmazione. Possiamo pensare ai driver allo stesso modo di quelli per database relazionali che probabilmente abbiamo usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQ, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base piuttosto che con le librerie di più alto livello è libera. Ne faccio cenno perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza di driver ufficiali e di librerie della community - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework (spesso basandosi sui driver ufficiali -ndt).
 
-Durante la lettura del libro ti invito a giocare con MongoDB, mettendo in pratica quel che propongo ed anche sperimentando per conto tuo, rispondendo alle domande che senz'altro ti farai. E' facile cominciare a lavorare con MongoDB, quindi diamoci subito da fare e cominciamo configurando quel che ci serve.
+Nel corso della lettura del libro vi invito a giocare con MongoDB, sia mettendo in pratica quel che propongo che sperimentando in proprio, rispondendo alle domande che senz'altro sorgeranno spontanee. E' facile cominciare a lavorare con MongoDB, quindi diamoci subito da fare cominciando dalla configurazione di quel che ci serve.
 
-1. Vai alla [pagina di download ufficiale](http://www.mongodb.org/downloads) è scarica i file binari per il tuo sistema operativo (scegli la versione stabile raccomandata). Ai fini dello sviluppo puoi prelevare indifferentemente la versione a 32-bit o 64-bit.
+1. Andate alla [pagina di download ufficiale](http://www.mongodb.org/downloads) e scaricate i file binari per il vostro sistema operativo (scegliete la versione stabile raccomandata). Ai fini dello sviluppo potete prelevare indifferentemente la versione a 32-bit o 64-bit.
 
-2. Scompatta l'archvio (non importa la posizione) quindi vai alla cartella `bin`. Non eseguire nulla, ma sappi che `mongod` è il processo server mentre `mongo` è la shell (il client) - questi sono i due eseguibili coi quali passeremo gran parte del nostro tempo.
+2. Scompattate l'archvio (non importa la posizione) quindi andate alla cartella `bin`. Non eseguite nulla, ma sappiate che `mongod` è il processo server mentre `mongo` è la shell (il client) - questi sono i due eseguibili coi quali passeremo gran parte del nostro tempo.
 
-3. Crea un nuovo file di testo nella cartella `bin` e chiamalo `mongodb.config`.
+3. Create un nuovo file di testo nella cartella `bin` e chiamatelo `mongodb.config`.
 
-4. Aggiungi questa riga al tuo mongodb.config: dbpath=PERCORSO_DOVE_VUOI_SALVARE_IL_TUO_DATABASE`. Ad esempio, su Windows potresti scegliere `dbpath=c:\mongodb\data` mentre su Linux una scelta valida potrebbe essere `dbpath=/etc/mongodb/data`.
+4. Aggiungete questa riga al vostro mongodb.config: dbpath=PERCORSO_DOVE_VOLETE_SALVARE_IL_TUO_DATABASE`. Ad esempio, su Windows potreste scegliere `dbpath=c:\mongodb\data` mentre su Linux una scelta valida potrebbe essere `dbpath=/etc/mongodb/data`.
 
-5. Assicurati che il `dbpath` che hai indicato esista.
+5. Assicuratevi che il `dbpath` che scelto esista.
 
-6. Lancia mongod con l'opzione `--config /path/to/your/mongodb.config`.
+6. Lanciate mongod con l'opzione `--config /path/al/vostro/mongodb.config`.
 
 Ad esempio un utente Windows potrebbe estrarre il file scaricato in `c:\mongodb\` e creare la cartella `c:\mongodb\data\`. In questo caso all'interno di `c:\mongodb\bin\mongodb.config` dovrà specificare `dbpath=c:\mongodb\data\`. A questo punto può lanciare `mongod` dalla linea di comando con `c:\mongodb\bin\mongod --config c:\mongodb\bin\mongodb.config`.
 
-Naturalmente puoi aggiungere la cartella `bin` al tuo PATH per rendere tutto più facile. Tutto questo è valido anche per gli utenti MacOSX e Linux, che probabilmente dovranno adattare i percorsi.
+Naturalmente potete aggiungere la cartella `bin` al vostro PATH per rendere tutto più semplice. Tutto ciò è valido anche per gli utenti MacOSX e Linux, che probabilmente dovranno adattare i percorsi.
 
-A questo punto dovresti trovari con MongoDB pronto e operativo. Se invece ottieni un messaggio di errore, leggi con attenzione l'output - il server è piuttosto bravo a spiegare cos'è andato storto.
+A questo punto dovreste trovarvi con MongoDB pronto e operativo. Se invece ottienete un messaggio di errore, leggete con attenzione l'output - il server è piuttosto bravo a spiegare cos'è andato storto.
 
-Puoi lanciare `mongo` (senza la *d*) che connetterà la shell al tuo server in esecuzione. Prova a digitare `db.version()` per assicurarti che tutto sta funzionando come si deve. Dovresti vedere il numero della versione che hai installato.
+Potete lanciare `mongo` (senza la *d*), che connetterà la shell al vostro server in esecuzione. Provate a digitare `db.version()` per assicurarvi che tutto stia funzionando  a dovere. Dovreste vedere il numero della versione installata.
 
 \clearpage
 
 ## Capitolo 1 - Le Basi ##
-Cominciamo il nostro viaggio imparando i meccanismi base di MongoDB. Ovviamente sono fondamentali per capire MongoDB, ma a un livello più generale ci aiuterannoa rispondere alle nostre domande sul ruolo stesso di MongoDB.
+Cominciamo il nostro viaggio dai meccanismi base di MongoDB. Ovviamente sono fondamentali per capire MongoDB, ma a un livello più generale ci aiuterannoa a rispondere alle nostre domande sul ruolo di MongoDB.
 
 Per cominciare, ci sono sei semplici concetti che dobbiamo comprendere.
 
-1. MongoDB implementa lo stesso concetto di 'database' al quale probabilmente siete abituati (o schema, se venite dal mondo Oracle). All'interno di una istanza MongoDB potete avere zero o più database, ognuno dei quali agisce come un contenitore di alto livello per tutto il resto.
+1. MongoDB implementa lo stesso concetto di 'database' al quale probabilmente siamo abituati (o schema, se venite dal mondo Oracle). All'interno di una istanza MongoDB potete avere zero o più database, ognuno dei quali agisce come un contenitore di alto livello per tutto il resto.
 
 2. Un database può avere zero o più 'collezioni'. Una collezione ha molto in comune con le 'tabelle' tradizionali, tanto che potete considerarle la stessa cosa.
 
@@ -95,68 +95,65 @@ Per cominciare, ci sono sei semplici concetti che dobbiamo comprendere.
 
 6. I 'cursori', a cui spesso viene data poca importanza, sono qualcosa di diverso dagli altri cinque concetti, e li ritengo abbastanza importanti da meritare attenzione. E' importante sapere che quando si chiedono dati a MongoDB questi restituisce un cursore col quale possiamo, per esempio, contare i documenti o spostarci avanti, senza che alcun dato venga effettivamente letto.
 
-Riassumendo, MongoDB è fatto di 
+Riassumendo, MongoDB è fatto di `database` che contengono `collezioni`. Una `collezione` è una raccolta di `documenti`. Ogni `documento` è composto da `campi`. Le `collezioni` possono essere `indicizzate`, il che migliora le prestazioni di ricerche e ordinamenti. Infine, quando chiediamo dati a MongoDB otteniamo un `cursore`, la cui esecuzione è rinviata finché non si renderà necessaria.
 
+Vi potreste domandare per quale ragione adottiamo una nuova terminologia (collezione invece di tabella, documento al posto di riga e campo piuttosto che colonna). Vogliamo solo complicare le cose? La verità è che questi nuovi concetti non sono identici alle loro controparti presenti nei database relazionali. La differenza più importante è che i database relazionali definiscono le `colonne` a livello `tabella`, mentre i database orientati ai documenti definiscono i `campi` a livello di `documento`. Ciò significa che ogni `documento` di una `collezione` può avere il suo set esclusivo di `campi`. Ne consegue che una `collezione` è un contenitore più semplice di una `tabella`, laddove un `documento` ha molte più informazioni di una `riga`.
 
-Riassumendo, MongoDB è fatto di `database` che contengono `collezioni`. Una `collezione` è una raccolta di `documenti`. Ogni `documento` è composto da `campi`. Le `collezioni` possono essere `indicizzate`, il che migliora le prestazioni delle ricerche e degli ordinamenti. Infine, quando chiediamo dati a MongoDB otteniamo un `cursore` la cui esecuzione è rinviata finché non si rende necessaria.
+Si tratta di un concetto importante da comprendere, ma non c'è da preoccuparsi se al momento non tutto è chiaro. Basteranno un paio di inserimenti per capire il vero significato di tutto questo. In definitiva una collezione non vincola il suo contenuto (è senza schema, o schema-less). I campi vengono tracciati per ogni singolo documento. Esploreremo vantaggi e svantaggi di tutto questo in uno dei prossimi capitoli.
 
-Vi potreste domandare per quale ragione adottiamo una nuova terminologia (collezione invece di tabella, documento al posto di riga e campo piuttosto che colonna). Vogliamo solo complicare le cose? La verità è che questi nuovi concetti non sono identici alle loro controparti nei database relazionali. La differenza più importante è che i database relazionali definiscono le `colonne` a livello `tabella` mentre i database orientati ai documenti definiscono i `campi` a livello di `documento`. Ciò significa che ogni `documento` di una `collezione` può avere il suo set esclusivo di `campi`. Ne consegue che una `collezione` è un contenitore più semplice di una `tabella`, laddove un `documento` ha molte più informazioni di una `riga`.
+Cominciamo a darci da fare. Se ancora non l'avete fatto eseguite pure il server `mongod` e la mongo shell. La shell esegue codice JavaScript. Ci sono alcuni comandi globali che potete lanciare, come `help` o `exit`. I comandi lanciati sul database attivo si eseguono nei confronti dell'oggetto `db`, come ad esempio `db.help()` o `db.stats()`. I comandi lanciati nei confronti una collezione specifica, cosa che si fa spesso, vanno eseguiti sull'oggetto `db.NOME_COLLEZIONE`, come per esempio `db.unicorns.help()` oppure `db.unicorns.count()`.
 
-Si tratta di una cosa importante da capire, ma non c'è da preoccuparsi se il concetto non è ancora chiaro. Basteranno un paio di inserimenti per capire il vero significato di tutto questo. In definitiva una collezione non vincola il suo contenuto (è senza schema, o schema-less). I campi vengono tracciati in ogni singolo documento. Esploreremo vantaggi e svantaggi di tutto questo in uno dei prossimi capitoli.
+Provate a digitare `db.help()`. Otterrete una lista dei comandi che è possibile eseguire nei confronti dell'oggetto `db`.
 
-Cominciamo a darci da fare. Se ancora non l'avete fatto eseguite pure il server `mongod` e la mongo shell. La shell esegue codice JavaScript. Ci sono alcuni comandi globali che potete lanciare, come `help` o `exit`. I comandi lanciati nei confronti del database attivo si eseguono nei confronti dell'oggetto `db`, come ad esempio `db.help()` o `db.stats()`. I comandi lanciati nei confronti una collezione specifica, cosa che avviene spesso, vanno eseguiti nei confronti dell'oggetto `db.NOME_COLLEZIONE`, come per esempio `db.unicorns.help()` oppure `db.unicorns.count()`.
+Piccola nota a margine. Poiché questa è una shell JavaScript, se eseguite un metodo e omettete le parentesi `()` vedrete il contenuto del metodo piuttosto che ottenerne l'esecuzione. Ve lo ricordo affinché non rimaniate sorpresi la prima volta che vi capiterà di vedere una risposta che comincia con `function (...){`. Per esempio, se digitate `db.help` (senza le parentesi) quello che otterrete è la visualizzazione dell'implementazione interna del metodo `help`.
 
-Provate a digitare `db.help()`. Otterrete una lista dei comandi che è possibile eseguire nei confornti dell'oggetto `db`.
-
-Piccola nota a margine. Poiché questa è una shell JavaScript, se eseguite un metodo e omettete le parentesi `()`, vedrete il contenuto del metodo piuttosto che ottenerne l'esecuzione. Ve lo ricordo affinché la prima volta che vi capiterà di farlo e di vedere una risposta che comincia con `function (...){` non rimaniate sorpresi. Per esempio se inserite `db.help` (senza le parentesi) quello che otterrete è la visualizzazione dell'implementazione interna del metodo `help`.
-
-Prima di tutto useremo il metodo globale `use` per cambiare il database attivo. Digitate `use learn`. Non importa che il database non esista ancora. Quando creeremo la prima collezione, allora verrà creato anche il database `learn`. Ora che abbiamo un database attivo possiamo eseguire comandi sul database stesso, come per esempio `db.getCollectionNames()`. Se lo fate dovreste ottenere un array vuoto (`[ ]`). Poiché le collezioni sono schema-less non c'è necessità di crearle esplicitamente. Possiamo semplicemente inserire un documento nella nuova collezione. Per farlo usiamo il comando `insert`, passandogli direttamente il documento da inserire:
+Prima di tutto useremo il metodo globale `use` per cambiare il database attivo. Digitate `use learn`. Non importa che il database non esista ancora. Quando creeremo la prima collezione, allora verrà creato anche il database `learn`. Ora che abbiamo un database attivo possiamo eseguire comandi sul database stesso, come per esempio `db.getCollectionNames()`. Se lo fate ora dovreste ottenere un array vuoto (`[ ]`). Poiché le collezioni sono schema-less non c'è necessità di crearle esplicitamente. Possiamo semplicemente inserire un documento nella nuova collezione. Per farlo usiamo il comando `insert`, passandogli direttamente il documento da inserire:
 
 	db.unicorns.insert({name: 'Aurora', gender: 'f', weight: 450})
 
-La riga esegue il comando `insert` nei confronti della collezione `unicorns`, passandogli un singolo argomento. Per la serializzazione MongoDB usa internamente il formato JSON binario. Esternamente ciò significa che useremo parecchio JSON, come nel caso dei nostri parametri. Se ora eseguiamo `db.getCollectionNames()` otteniamo due collezioni: `unicorns` e `system.indexes`. `system.indexes` viene creata una volta per database, e contiene informazioni sugli indici del database.
+La riga esegue il comando `insert` nei confronti della collezione `unicorns`, passando un singolo argomento. Per la serializzazione MongoDB usa internamente il formato JSON binario. Esternamente ciò significa che useremo parecchio JSON, come nel caso dei nostri parametri. Se ora eseguiamo `db.getCollectionNames()` otteniamo due collezioni: `unicorns` e `system.indexes`. `system.indexes` viene creata una volta per database, e contiene informazioni sugli indici del database.
 
 Ora possiamo usare il comando `find` sulla collezione `unicorns` per ottenere una lista di documenti:
 
 	db.unicorns.find()
 
-Notate che in aggiunta ai dati che avete specificato c'è un campo `_id`. Ogni documento deve avere un campo `_id` univoco. Potete generarlo da voi oppure lasciare che sia MongoDB a generare un ObjectId per voi. Probabilmente la maggior parte delle volte sarà sufficiente lasciarlo generare a MongoDB. Per impostazione predefinita il campo `_id` è indicizzato - il che spiega l'esistenza della collezione `system.indexes`. E' possibile consultare l'elenco degli indici:
+Notate che in aggiunta ai dati che avete indicato c'è un campo `_id`. Ogni documento deve avere un campo `_id` univoco. Potete generarlo da voi oppure lasciare che sia MongoDB a generare un ObjectId per voi. Probabilmente la maggior parte delle volte sarà sufficiente lasciarlo generare a MongoDB. Per impostazione predefinita il campo `_id` è indicizzato - il che spiega l'esistenza della collezione `system.indexes`. E' possibile consultare l'elenco degli indici:
 
 	db.system.indexes.find()
 
-Ciò che otteniamo è il nome dell'indice, il database e la collezione nel quale è stato creato e l'elenco dei campi inclusi nell'indice.
+Ciò che otteniamo è il nome dell'indice, il database e la collezione ai quali appartiene e l'elenco dei campi inclusi nell'indice.
 
 Torniamo alla nostra discussione sulle collezioni schema-less. Inseriamo un documento completamente diverso nella collezione `unicorns`:
 
 	db.unicorns.insert({name: 'Leto', gender: 'm', home: 'Arrakeen', worm: false})
 
-Usiamo di nuovo `find` per vedere la lista dei documenti. Quando sapremo qualcosa in più discuteremo questo interessante comportamento di MongoDB, ma a questo punto dovreste cominciare a comprendere perché la terminologia tradizionale non è più adeguata.
+Usiamo di nuovo `find` per vedere la lista dei documenti. Quando conosceremo qualcosa in più discuteremo questo interessante comportamento di MongoDB, ma giunti a questo punto dovreste cominciare a comprendere perché la terminologia tradizionale non è la più adeguata.
 
 ### Padroneggiare i Selettori ###
-Oltre ai sei concetti già visti c'è un aspetto pratico di MongoDB che è necessario comprendere a fondo prima di poter continuare con argomenti più avanzati: i selettori di query (query selectors). Un selettore di query in MongoDB assomiglia alla clausola `where` di un comando SQL. In quanto tale viene usato per trovare, contare, aggiornare e rimuovere documenti dalle collezioni. Un selettore è un oggetto JSON la cui forma più semplice è `{}` che rintraccia tutti i documenti (`null` è altrettando valido). Se volessimo trovare tutti gli unicorni femmina potremmo usare `{gender:'f'}`.
+Oltre ai sei concetti già visti c'è un aspetto pratico di MongoDB che è necessario comprendere a fondo prima di procedere con argomenti più avanzati: i selettori di query (query selectors). Un selettore di query in MongoDB assomiglia alla clausola `where` di un comando SQL. In quanto tale viene usato per trovare, contare, aggiornare e rimuovere documenti dalle collezioni. Un selettore è un oggetto JSON la cui forma più semplice è `{}`, che rintraccia tutti i documenti (`null` è altrettando valido). Se volessimo trovare tutti gli unicorni femmina potremmo usare `{gender:'f'}`.
 
-Prima di addentrarci a fondo nei selettori prepariamo un po' di dati con cui giocare. Prima di tutto cancellerriamo ciò che abbiamo inserito finora nella collezione `unicorns`: `db.unicorns.remove()` (poiché non stiamo fornendo un selettore, rimuoveremo tutti i documenti). Ora digitiamo i comandi di inserimento seguenti, così da ottenere un po' di dati con cui lavorare (suggerisco di copiare e incollare da qui):
+Prima di addentrarci a fondo nei selettori prepariamo un po' di dati con cui giocare. Prima di tutto cancelliamo ciò che abbiamo inserito finora nella collezione `unicorns`: `db.unicorns.remove()` (poiché forniamo un selettore, rimuoveremo tutti i documenti). Ora digitiamo i comandi di inserimento che seguono, così da ottenere un po' di dati con cui lavorare (vi suggerisco di copiarli e incollarli da qui):
 
 	db.unicorns.insert({name: 'Horny', dob: new Date(1992,2,13,7,47), loves: ['carrot','papaya'], weight: 600, gender: 'm', vampires: 63});
 	db.unicorns.insert({name: 'Aurora', dob: new Date(1991, 0, 24, 13, 0), loves: ['carrot', 'grape'], weight: 450, gender: 'f', vampires: 43});
 	db.unicorns.insert({name: 'Unicrom', dob: new Date(1973, 1, 9, 22, 10), loves: ['energon', 'redbull'], weight: 984, gender: 'm', vampires: 182});
 	db.unicorns.insert({name: 'Roooooodles', dob: new Date(1979, 7, 18, 18, 44), loves: ['apple'], weight: 575, gender: 'm', vampires: 99});
 	db.unicorns.insert({name: 'Solnara', dob: new Date(1985, 6, 4, 2, 1), loves:['apple', 'carrot', 'chocolate'], weight:550, gender:'f', vampires:80});
-	db.unicorns.insert({name:'Ayna', dob: new Date(1998, 2, 7, 8, 30), loves: ['strawberry', 'lemon'], weight: 733, gender: 'f', vampires: 40});
-	db.unicorns.insert({name:'Kenny', dob: new Date(1997, 6, 1, 10, 42), loves: ['grape', 'lemon'], weight: 690,  gender: 'm', vampires: 39});
+	db.unicorns.insert({name: 'Ayna', dob: new Date(1998, 2, 7, 8, 30), loves: ['strawberry', 'lemon'], weight: 733, gender: 'f', vampires: 40});
+	db.unicorns.insert({name: 'Kenny', dob: new Date(1997, 6, 1, 10, 42), loves: ['grape', 'lemon'], weight: 690,  gender: 'm', vampires: 39});
 	db.unicorns.insert({name: 'Raleigh', dob: new Date(2005, 4, 3, 0, 57), loves: ['apple', 'sugar'], weight: 421, gender: 'm', vampires: 2});
 	db.unicorns.insert({name: 'Leia', dob: new Date(2001, 9, 8, 14, 53), loves: ['apple', 'watermelon'], weight: 601, gender: 'f', vampires: 33});
 	db.unicorns.insert({name: 'Pilot', dob: new Date(1997, 2, 1, 5, 3), loves: ['apple', 'watermelon'], weight: 650, gender: 'm', vampires: 54});
 	db.unicorns.insert({name: 'Nimue', dob: new Date(1999, 11, 20, 16, 15), loves: ['grape', 'carrot'], weight: 540, gender: 'f'});
 	db.unicorns.insert({name: 'Dunx', dob: new Date(1976, 6, 18, 18, 18), loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165});
 
-Ora che abbiamo i dati possiamo fare pratica coi selettori. Usiamo `{campo: valore}` per trovare documenti il cui `campo` sia uguale a `valore`. Usiamo `{field1: value1, field2: value2}` per indicare l'operatore `and`. Usiamo `$lt`, `$lte`, `$gt`, `$gte` e `$ne` come operatori minore di (less than), minore o uguale (less than or equale), maggiore di (greater than), maggiore o uguale (greater then or equal) e diverso da (not equal). Per esempio, per ottenere tutti gli unicorni maschi che pesano più di 700 libbre possamo usare:
+Ora che abbiamo i dati possiamo fare pratica coi selettori. Usiamo `{campo: valore}` per trovare documenti il cui `campo` sia uguale a `valore`. Usiamo `{campo1: valore1, campo2: valore2}` per indicare l'operatore `and`. Usiamo gli operatori `$lt`, `$lte`, `$gt`, `$gte` e `$ne` rispettivamente per minore di (less than), minore o uguale (less than or equal), maggiore di (greater than), maggiore o uguale (greater then or equal) e diverso da (not equal). Per esempio, per ottenere tutti gli unicorni maschi che pesano più di 700 libbre possiamo usare:
 
 	db.unicorns.find({gender: 'm', weight: {$gt: 700}})
 	//oppure (non è la scelta migliore, ma vale come esempio)
 	db.unicorns.find({gender: {$ne: 'f'}, weight: {$gte: 701}})
 
-L'operatore `$exists` è usato per verificare la presenza o l'assenza di un campo, per esempio:
+L'operatore `$exists` va usato per verificare la presenza o l'assenza di un campo, per esempio:
 
 	db.unicorns.find({vampires: {$exists: false}})
 
@@ -164,20 +161,20 @@ Dovrebbe restituire un singolo documento. Se vogliamo un OR invece di un AND usi
 
 	db.unicorns.find({gender: 'f', $or: [{loves: 'apple'}, {loves: 'orange'}, {weight: {$lt: 500}}]})
 
-Questa istruzione restituisce tutti gli unicorni femmina che amano le mele (apple), le arance (orange) oppure che pesano (weight) meno di 500 librre.
+Questa istruzione restituisce tutti gli unicorni femmina che amano le mele (apple), le arance (orange) oppure che pesano (weight) meno di 500 libbre.
 
 Nell'ultimo esempio succede qualcosa di interessante. Forse avrete notato che il campo `loves` è un array. MongoDB supporta gli array come oggetti di prima classe. Questa è una caratteristica incredibilmente utile. Una volta cominciato ad usarla ti domanderai come hai potuto vivere senza finora. Ciò che è ancor più interessante è quanto sia facile fare selezioni basate su un valore array: `{loves: 'watermelon'}` restituisce qualunque documento che abbia campi 'loves' valorizzati a 'watermelon'.
 
-Sono disponibili più operatori di quelli che abbiamo visto finora. Il più flessibile è `$where`, il quale ci permette di passare codice JavaScript da eseguire sul server. Questi operatori sono discussi nella sezione [Advanced Queries](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries) del sito di MongoDB. Quel che abbiamo visto finora è sufficiente per cominciare con MongoDB, ed è anche ciò che userete per la maggior parte del tempo.
+Sono disponibili più operatori di quelli che abbiamo visto finora. Il più flessibile è `$where`, il quale ci permette di passare codice JavaScript da eseguire sul server. Questi operatori sono discussi nella sezione [Advanced Queries](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries) del sito di MongoDB. Quel che abbiamo visto fin qui è sufficiente per cominciare con MongoDB, ed è anche ciò che userete per la maggior parte del tempo.
 
-Abbiamo visto come i selettori possano essere usati col comando `find`. Possono essere adoperati anche con `remove`, già incontrato brevemente, `count`, che ancora non abbiamo ancora ma che potete intuire da soli, e col comando `update` a cui ci dedicheremo in seguito.
+Abbiamo visto come i selettori possano essere usati in abbinamento al comando `find`. Possono essere adoperati anche con `remove`, già incontrato brevemente, `count`, che ancora non abbiamo visto ma il cui significato potete intuire da soli, e col comando `update` a cui ci dedicheremo in seguito.
 
-Il `ObjectId` che MongoDB ha generato per il nostro campo `_id` puà a sua volta essere selezionato:
+Il `ObjectId` che MongoDB ha generato per il nostro campo `_id` può a sua volta essere selezionato:
 
-	db.unicorns.find({_id: ObjectId("TheObjectId")})
+	db.unicorns.find({_id: ObjectId("L'ObjectId")})
 
 ### Riepilogo ###
-Non abbiamo ancora studiato il comando `update` né abbiamo visto le cose più interessanti che possiamo ottenere con `find`. Tuttavia abbiamo fatto partire MongoDB, abbiamo dato una occhiata ai comandi `inset` e `remove` (su questi non c'è molto altro da aggiungere). Abbiamo introdotto `find` e scoperto che cosa sono i 'selectors' (selettori) in MongoDB. Siamo partiti col piede giusto impostando le basi per quel che deve ancora venire. Che ci crediate o no, a questo punto conoscete la maggior parte di quel che serve sapere per usare MongoDB - è davvero progettato per essere facile e veloce da imparare e usare. Vi invito caldamente a giocare con la vostra copia locale prima di proseguire. Inserite documenti diversi, possibilmente in nuove collezioni, e prendete confidenza con i vari selettori. Usate `find`, `find` e `remove`. Dopo pochi tentativi ciò che ora può sembrare poco chiaro finira probabilmente per avere senso.
+Non abbiamo ancora conosciuto il comando `update` né abbiamo visto le cose più interessanti che possiamo ottenere con `find`. Tuttavia abbiamo fatto partire MongoDB, abbiamo dato una occhiata ai comandi `insert` e `remove` (su questi non c'è molto altro da aggiungere). Abbiamo introdotto `find` e scoperto che cosa sono i 'selettori' in MongoDB. Siamo partiti col piede giusto, impostando le basi per quel che deve ancora venire. Che ci crediate o no, a questo punto conoscete la maggior parte di quel che serve sapere per lavorare con MongoDB - è progettato davvero per essere facile e veloce da imparare e usare. Vi invito caldamente a giocare con la vostra copia locale prima di proseguire. Inserite documenti diversi, possibilmente in nuove collezioni, e prendete confidenza con i diversi selettori. Usate `find`, `count` e `remove`. Dopo pochi tentativi ciò che ora può sembrare poco chiaro finirà probabilmente per avere senso.
 
 \clearpage
 
