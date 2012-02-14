@@ -179,51 +179,51 @@ Non abbiamo ancora conosciuto il comando `update` né abbiamo visto le cose più
 \clearpage
 
 ## Capitolo 2 - Gli Aggiornamenti ##
-Nel primo capitolo abbiamo introdotto tre delle quattro operazioni CRUD (create, read, update, delete). Questo capitolo è dedicato all'operazione di cui non abbiamo ancora parlato: `update`. Quest'ultima riserva qualche sorpresa, e per questo motivo gli dedichiamo un capitolo.
+Nel primo capitolo abbiamo introdotto tre delle quattro operazioni CRUD (create, read, update, delete). Questo capitolo è dedicato all'operazione di cui non abbiamo ancora parlato: `update`. Quest'ultima riserva qualche sorpresa, e per questo motivo le dedichiamo un intero capitolo.
 
-### Update: Replace Versus $set ###
-Nella sua forma più semplice `update` richiede due argomenti: il selettore da usare (where) e il valore del campo da aggiornare. Se Roooooodles avesse guadagnato qualche chilo, potremmo usare:
+### Update: Replace vs $set ###
+Nella sua forma più semplice `update` richiede due argomenti: il selettore da usare (where) e il valore del campo da aggiornare. Se Roooooodles avesse guadagnato qualche chilo, potremmo fare:
 
 	db.unicorns.update({name: 'Roooooodles'}, {weight: 590})
 
-(se nel frattempo avete cambiato la collezione `unicorns` e i dati originali sono compromessi, procedete con un `remove` di tutti i documenti e re-inserite i dati col codice visto nel capitolo 1).
+(se nel frattempo avete cambiato la collezione `unicorns` e i dati originali sono compromessi, procedete con un `remove` di tutti i documenti quindi re-inserite i dati col codice visto nel capitolo 1).
 
-Se questo fosse codice reale aggiorneremmo i dati in base al campo `_id`, ma poiché non possiamo sapere a priori quale `_id` verrà generato da MongoDB, continueremo a usare `names`. Ora, se andiamo a cercare il record che abbiamo aggiornato:
+Se questo fosse codice reale aggiorneremmo i dati in base al campo `_id`, ma poiché non possiamo sapere a priori quale `_id` verrà generato da MongoDB, continueremo a usare `name`. Ora, se andiamo a cercare il record che abbiamo aggiornato:
 
 	db.unicorns.find({name: 'Roooooodles'})
 
-Abbiamo la prima sopresa che `update` ci riserva. Non viene trovato alcun documento perchè il secondo parametro che forniamo viene usato per **sostituire** l'originale. In altre parole la nostra `update` ha cercato il documento per `name`, quindi ha sostituito l'intero documento con il nuovo documento (il secondo parametro). Questo è molto diverso da come funziona il comando `update` nel mondo SQL. In alcune situazioni questo è molto comodo, e può essere sfruttato per ottnere aggiornamenti molto dinamici. Tuttavia, quando tutto quel che vogliamo fare è cambiare il valore di uno o più campi, è meglio usare il modificatore `$set` di MongoDB:
+Abbiamo la prima sopresa che `update` ci riserva. Non viene trovato alcun documento perchè il secondo parametro che forniamo viene usato per **sostituire** l'originale. In altre parole la nostra `update` ha cercato il documento per `name`, quindi ha sostituito l'intero documento con il nuovo documento (il secondo parametro). Questo è molto diverso dal funzionamento del comando `update` nel mondo SQL. In alcune situazioni questo comportamento è molto comodo, e può essere sfruttato per ottenere aggiornamenti davvero dinamici. Tuttavia, quando tutto quel che vogliamo è cambiare il valore di uno o più campi è meglio usare il modificatore `$set` di MongoDB:
 
 	db.unicorns.update({weight: 590}, {$set: {name: 'Roooooodles', dob: new Date(1979, 7, 18, 18, 44), loves: ['apple'], gender: 'm', vampires: 99}})
 
-Questo ripristinerà i campi perduti. Non sovrascriverà il nuovo `weight` dato che non l'abbiamo specificato. Ora se eseguiamo:
+Questo ripristinerà i campi perduti. Non sovrascriverà il nuovo `weight` dato che non l'abbiamo indicato nel secondo argomento. Ora se eseguiamo:
 
 	db.unicorns.find({name: 'Roooooodles'})
 
-Otteniamo il risultato che volevamo. Quindi, il modo corretto di aggiornare il peso sarebbe stato:
+Otteniamo il risultato che volevamo. Quindi il modo corretto di aggiornare il peso sarebbe stato:
 
 	db.unicorns.update({name: 'Roooooodles'}, {$set: {weight: 590}})
 
 ### Modificatori di Aggiornamento ###
-Oltre a `$set` possiamo azionare altri modificatori che ci consentono di fare cose eleganti. Tutti questi modificatori di aggiornamento operano sui campi - non azzerano l'intero documento. Per esempio il modificatore `$inc` viene usato per aumentare il valore di un campo di un certo valore, positivo o negativo. Supponiamo che a Pilot siano stati assegnate per errore un paio di uccisioni di vampiri; potremmo correggere l'errore eseguendo:
+Oltre a `$set` possiamo azionare altri modificatori che ci consentono di fare cose eleganti. Tutti questi modificatori di aggiornamento agiscono sui campi - non azzerano l'intero documento. Per esempio il modificatore `$inc` consente di aumentare o diminuire il valore di un campo. Supponiamo che a Pilot siano state assegnate un paio di uccisioni di vampiri di troppo; potremmo correggere l'errore eseguendo:
 
 	db.unicorns.update({name: 'Pilot'}, {$inc: {vampires: -2}})
 
-Se Aurora sviluppasse improvvisamente un'amore per i dolci, potremmo aggiungere un valore al suo array di `loves` usando il modificatore `$push`:
+Se Aurora sviluppasse improvvisamente una passione per i dolci, potremmo aggiungerli al suo array `loves` con il modificatore `$push`:
 
 	db.unicorns.update({name: 'Aurora'}, {$push: {loves: 'sugar'}})
 
 La sezione [Updating](http://www.mongodb.org/display/DOCS/Updating) del sito di MongoDB ha informazioni sugli altri modificatori di aggiornamento disponibili.
 
 ### Upserts ###
-Una delle sorprese più piacevoli che il nostro `update` ci riserva è il supporto per gli `upsert`. Se trova il documento cercato, `upsert` lo aggiorna, altrimenti lo crea. Gli upsert sono comodi in diverse situazioni, ve ne renderete conto non appena vi ci imbatterete. Per attivare gli upsert impostiamo un terzo parametro a `true` (vero).
+Una delle sorprese più piacevoli che `update` ci riserva è senz'altro il supporto per gli `upsert`. Se `upsert` trova il documento cercato lo aggiorna, altrimenti lo crea. Gli upsert sono utili in diverse situazioni, ve ne renderete conto non appena vi ci imbatterete. Per attivare gli upsert impostiamo un terzo parametro a `true`.
 
-Un esempio banale è quello di contantore di visite ad un sito web. Se volessimo gestire un contatore in tempo reale dovremmo verificare l'esistenza del record per la pagina attuale, quindi decidere per l'inserimento o l'aggiornamento. Omettendo il terzo parametro (o mettendolo a false), l'esecuzione del comando seguente non ottiene alcun risultato:
+Un esempio banale è quello di contantore di visite ad un sito web. Se volessimo gestire un contatore in tempo reale dovremmo verificare l'esistenza del record per la pagina attuale, quindi decidere per l'inserimento o l'aggiornamento. Poiché omettiamo il terzo parametro (oppure se lo impostiamo a false) l'esecuzione del comando seguente non ottiene risultati:
 
 	db.hits.update({page: 'unicorns'}, {$inc: {hits: 1}});
 	db.hits.find();
 
-Tuttavia, se attiviamo gli upsert, il risultato cambia:
+Tuttavia attivando gli upsert il risultato cambia:
 
 	db.hits.update({page: 'unicorns'}, {$inc: {hits: 1}}, true);
 	db.hits.find();
@@ -234,7 +234,7 @@ Poiché non esistono documenti col campo `page` equivalente a `unicorns`, viene 
 	db.hits.find();
 
 ### Aggiornamenti Multipli ###
-L'ultima sorpresa che `update` ci riserva è il fatto che, per default, aggiorna un singolo documento. Per gli esempi che abbiamo visto finora, questo comportamente potrebbe sembrare logico. Tuttavia, se eseguiste qualcosa di questo genere:
+L'ultima sorpresa che `update` ci riserva è il fatto che, per default, aggiorna un solo documento. Stando agli esempi visti finora questo comportamente sembrebbe logico. Tuttavia se eseguiste qualcosa di questo genere:
 
 	db.unicorns.update({}, {$set: {vaccinated: true }});
 	db.unicorns.find({vaccinated: true});
@@ -246,34 +246,34 @@ Probabilmente vi aspettereste di trovare tutti i vostri preziosi unicorni vaccin
 	db.unicorns.find({vaccinated: true});
 
 ### Riepilogo ###
-Questo capitolo conclude la nostra introduzone alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update`, scoprendo tre comportamenti interessanti. Primo, a differenza di una update SQL, la `update` in MongoDB sostituisce un documento. Per questo motivo il modificatore `$set` è piuttosto utile. Secondo, `update` supporta l`upsert` (aggiornamento o inserimento) in maniera piuttosto intuitiva, ciò che lo rende particolarmente utile quando abbinato al modificatore `$inc`. Infine, per default `update` aggiorna solo il primo documento trovato.
+Questo capitolo conclude la nostra introduzone alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update` scoprendo tre comportamenti interessanti. Primo, a differenza di una update SQL, la `update` in MongoDB sostituisce un documento. Per questo motivo il modificatore `$set` risulta piuttosto utile. Secondo, `update` supporta gli `upsert` (aggiornamento oppure inserimento) in modo piuttosto intuitivo, ciò che lo rende particolarmente utile quando viene abbinato al modificatore `$inc`. Infine, per default `update` aggiorna solo il primo documento trovato.
 
 Tenete sempre presente che stiamo usando MongoDB dal punto di vista della sua shell. Il driver e la libreria adottata potrebbero alterare questi comportamenti predefiniti, o esporre una API differente. Il driver Ruby, per esempio, unisce gli ultimi due parametri in una singola hash: `{:upsert => false, :multi => false}`.
 
 \clearpage
 
 ## Capitolo 3 - Padroneggiare il metodo Find ##
-Nel capitolo 1 abbiamo dato una occhiata superficiale al comando `find`. Su `find` c'è altro da sapere, la comprensione dei `selettori` non è sufficiente. Abbiamo già detto che `find` restituisce un `cursore`. E' giunta tempo di andare a fondo e vedere cosa possiamo fare esattamente.
+Nel capitolo 1 abbiamo dato una veloce occhiata al comando `find`. Su `find` c'è altro da sapere; la sola comprensione dei `selettori` non è sufficiente. Abbiamo già detto che `find` restituisce un `cursore`. E' giunta l'ora di andare a fondo e capire cosa ciò significa esattamente.
 
 ### Selettori di Campo ###
-Prima di passare ai `cursori` è necessario sapere che `find` accetta un secondo parametro opzionale. Si tratta dell'elenco dei campi che vogliamo recuperare. Per esempio, possiamo chiedere i nomi di tutti gli unicorni con questo comando:
+Prima di passare ai `cursori` è necessario sapere che `find` accetta un secondo parametro opzionale. Si tratta dell'elenco dei campi che vogliamo recuperare. Per esempio possiamo chiedere i nomi di tutti gli unicorni con questo comando:
 
 	db.unicorns.find(null, {name: 1});
 
-Per default il campo `_id` viene restituito sempre. Possiamo escluderlo in modo esplicito con `{name:1, _id: 0}`.
+Per default il campo `_id` viene restituito sempre. Possiamo escluderlo in modo esplicito con `{name: 1, _id: 0}`.
 
-Ad eccezione del campo `_id` non è possibile mescolare inclusioni ed esclusioni. A ben vedere ciò ha senso, di solito vogliamo escludere oppure includere uno o più campi esplicitamente.
+Ad eccezione del campo `_id`, non è possibile mescolare inclusioni ed esclusioni. A ben vedere ciò ha senso, di solito vogliamo escludere oppure includere uno o più campi esplicitamente.
 
 ### Ordinamenti ###
-Abbiamo ripetuto più volte che `find` restituisce un cursore la cui esecuzione è ritardata finché non si rende davvero necessaria. Tuttavia avrete senz'altro notato che nella shell `find` viene eseguito immediatamente. Questo è un comportamento esclusivo della shell. Possiamo osservare il vero comportamento dei `cursori` quando usiamo uno dei metodi che è possibile concatenare a `find`. Il primo che prendiamo in esame è `sort`. `sort` funziona in maniera simile al selettore di campo che abbiamo visto nella sezione precedente. Elenchiamo i campi da ordinare, usando 1 per ottenere un ordinamento crescente e -1 per uno discendente. Per esempio:
+Abbiamo ripetuto più volte che `find` restituisce un cursore la cui esecuzione è ritardata finché questa non si rende veramente necessaria. Tuttavia avrete senz'altro notato che nella shell `find` viene eseguito immediatamente. Questo è un comportamento peculiare della shell. Possiamo osservare il vero comportamento dei `cursori` quando usiamo uno dei metodi che è possibile concatenare a `find`. Il primo che prendiamo in esame è `sort`. `sort` funziona in maniera simile al selettore di campo che abbiamo visto nella sezione precedente. Elenchiamo i campi da ordinare, usando 1 per ottenere un ordinamento crescente e -1 per un ordinamento discendente. Per esempio:
 
 	//gli unicorni più pesanti per primi:
 	db.unicorns.find().sort({weight: -1})
 	
-	//per nome, quindi per il numero di vampiri uccisi:
+	//per nome, quindi per numero di vampiri uccisi:
 	db.unicorns.find().sort({name: 1, vampires: -1})
 
-Come succede nel caso dei database relazionali, per compiere l'ordinamento MongoDB è in grado di usare un indice. Approfondiremo gli indici più avanti, tuttavia è utile sapere che in assenza di un indice MongoDB limita la dimensione dell'ordinamento. Ciò significa che il tentativo di ordinamento di un set molto grande, sprovvisto di indice, genererà un errore. Alcuni ritengono che questa sia una limitazione. In realtà vorrei davvero che più database fossero capaci di rifiutare le query non ottimizzate (non ho intenzione di trasformare ogni svantaggio di MongoDB in un suo vantaggio, ma ho visto fin troppi database scarsamente ottimizzati per non sapere che un controllo più stretto sarebbe quanto mai necessario).
+Come succede nei database relazionali, anche MongoDB è in grado di ricorrere a un indice per eseguire un ordinamento. Approfondiremo gli indici più avanti, tuttavia è utile sapere che in assenza di un indice MongoDB impone un limite alla dimensione dell'ordinamento. Ciò significa che il tentativo di ordinare un set dati molto grande e sprovvisto di indice genererà un errore. Alcuni ritengono che questa sia una limitazione. In realtà vorrei davvero che più database fossero in grado di rifiutare le query non ottimizzate (non ho intenzione di trasformare ogni svantaggio di MongoDB in un vantaggio, ma ho visto fin troppi database scarsamente ottimizzati per non sapere che un controllo più stretto sarebbe quanto mai necessario).
 
 ### Paginazione ###
 La paginazione dei risultati può essere ottenuta con i metodi cursore `limit` e `skip`. Per ottenere solo il secondo e il terzo unicorno più pesante potremmo digitare:
@@ -292,20 +292,19 @@ In realtà `count` è a sua volta un metodo `cursore`, la shell in questo caso i
 	db.unicorns.find({vampires: {$gt: 50}}).count()
 
 ### Riepilogo ###
-Usare `find` e i `cursori` è piuttosto lineare. Ci sono alcuni comandi aggiuntivi che vedremo nei capitoli successivi, o che servono solo in casi rari ma, giunti a questo punto, dovreste cominciare a sentirvi a vostro agio sia con la shell di Mongo che nella comprensione dei fondamenti di MongoDB.
+Usare `find` e i `cursori` è piuttosto semplice. Ci sono alcuni comandi aggiuntivi che vedremo nei capitoli successivi, o che servono solo in casi rari ma, giunti a questo punto, dovreste cominciare a sentirvi a vostro agio nell'uso della shell di Mongo che nella comprensione dei principi fondamentali di MongoDB.
 
 \clearpage
 
 ## Capitolo 4 - Modellazione dei Dati ##
-Cambiamo marcia e passiamo a un argomento MongoDB più astratto. Spiegare qualche nuovo termine e nuove sintassi è tutto sommato un compito banale; parlare della modellazione dei dati applicata a un nuovo paradigma non è tutt'altra cosa. In realtà in fatto di modellazione con queste nuove tecnologie la maggior parte di noi è tutt'ora impegnata a scoprire cosa funziona e cosa no. Possiamo discuterne, ma in ultima analisi dovrete far pratica e imparare lavorando sul vero codice.
+Cambiamo marcia e passiamo a un argomento più astratto che riguarda MongoDB. Spiegare qualche nuovo termine e nuove sintassi è tutto sommato un compito banale; parlare della modellazione dei dati applicata a un nuovo paradigma quale è NoSQL è tutt'altra cosa. In realtà in fatto di modellazione dati applicata a queste nuove tecnologie tutti noi siamo ancora impegnati nel tentativo di scoprire cosa funziona e cosa no. Possiamo discuterne, ma in ultima analisi dovrete far pratica e imparare lavorando sul vero codice.
 
-In confronto alla gran parte delle soluzioni NoSQL i database orientati ai documenti sono probabilmente i meno differenti rispetto ai database relazionali. Le differenze sono sottili ma questo non significa che non siano importanti.
+In confronto alla gran parte delle soluzioni NoSQL i database orientati ai documenti sono probabilmente i meno differenti dai database relazionali. Le differenze sono sottili, ma questo non significa che non siano importanti.
 
 ### Niente Join ###
-La prima e fondamentale differenza alla quale dovrete abituarvi è l'assenza, in MongoDB, delle join. Non conosco la ragione precisa per cui almeno qualche tipo di join non sia supportato in MongoDB, ma so che in generale le join sono considerate non scalabili. Una volta cominciata la suddivisione dei dati finiamo prima o poi per eseguire le join sul client (l'application server). Al di là delle spiegazioni, rimane il fatto che i dati *sono* relazionali, e che MongoDB non supporta le join.
+La prima e fondamentale differenza alla quale dovrete abituarvi è l'assenza, in MongoDB, delle join. Non conosco la ragione precisa per cui almeno qualche tipo di join non sia supportato in MongoDB ma so che, in linea generale, le join sono considerate poco scalabili. Una volta che si comincia a suddividere orizzontalmente i dati si finirà prima o poi per lanciare le join lato client (l'application server). Al di là delle spiegazioni rimane il fatto che i dati *sono* relazionali, e che MongoDB non supporta le join.
 
-Con quel che sappiamo finora, per sopravvirere in un mondo senza join siamo costretti ad eseguirle attraverso il codice della nostra applicazione. In pratica dobbiamo lanciare una seconda query per trovare (`find`) i dati pertinenti alla nostra ricerca. Impostare i nostri dati non è diverso dal dichiarare una chiave esterna in un database relazionale. Spostiamo la nostra attenzione dai mercavigliosi unicorni (`unicorns`) agli impiegati (`employees`). La prima cosa che facciamo è creare un impiegato (fornirò un `_id` esplicito per poter costruire esempi coerenti)
-
+Per quel che sappiamo finora, sopravvirere in un mondo senza join significa eseguirle via codice nella nostra applicazione. In pratica dobbiamo lanciare una seconda query per trovare (`find`) i dati coerenti alla nostra ricerca. Impostare la ricerca non è diverso dal dichiarare una chiave esterna in un database relazionale. Lasciamo da parte i meravigliosi unicorni e passiamo agli impiegati (`employees`). La prima cosa che facciamo è creare un impiegato (al fine di costruire esempi coerenti userò un `_id` esplicito)
 
 	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d730"), name: 'Leto'})
 
@@ -314,28 +313,26 @@ Ora aggiungiamo un paio di impiegati e impostiamo `Leto` come loro manager:
 	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', manager: ObjectId("4d85c7039ab0fd70a117d730")});
 	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', manager: ObjectId("4d85c7039ab0fd70a117d730")});
 
-
-(vale la pena ripetere che `_id` può essre qualunque valore univoco. Poiché in una applicazione vera useremmo probabilmente un `ObjectId`, lo usiamo anche nel nostro esempio)
+(vale la pena ripetere che `_id` può essere un qualunque valore univoco. Poiché in una applicazione vera useremmo probabilmente un `ObjectId`, lo usiamo anche nel nostro esempio)
 
 Naturalmente per trovare tutti gli impiegati di Leto è sufficiente eseguire:
 
-
 	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
 
-Non c'è niente di magico. La maggior parte delle volte nel caso peggiore l'assenza delle join richiederà semplicemente una query extra (probabilmente su campi indicizzati).
+Niente di speciale. La maggior parte delle volte e nel caso peggiore, l'assenza di join richiederà semplicemente l'esecuzione di una query in più (e probabilmente sarà eseguita su campi indicizzati).
 
 #### Array e Documenti Incorporati ####
-L'assenza di join in MongoDB non significa che non ci siano un paio di assi nella manica. Ricordate quando abbiamo detto che MongoDB supporta gli array come oggetti di prima classe di un documento? Salta fuori che ciò è incredibilmente utile quando si ha che fare con relazioni molti-a-uno oppure molti-a-molti. Per esempio, nel caso che un impiegato possa avere due manager, potremmo facilmente memorizzarli in un array:
+L'assenza di join non significa che MongoDB non abbia un paio di assi nella manica. Ricordate quando abbiamo detto che MongoDB supporta gli array come oggetti di prima classe del documento? Scopriamo che ciò è incredibilmente utile quando abbiamo a che fare con relazioni uno-a-molti oppure molti-a-molti. Per esempio nel caso che un impiegato possa avere due manager, potremmo memorizzarli facilmente in un array:
 
 	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', manager: [ObjectId("4d85c7039ab0fd70a117d730"), ObjectId("4d85c7039ab0fd70a117d732")] })
 
-E' interessante notare che, per alcuni documenti, `manager` può essere un valore scalare, mentre per altri un array. La nostra query `find` originale funzionerà per entrambi i casi:
+E' interessante notare che per alcuni documenti `manager` può essere un valore scalare, mentre per altri può essere un array. La nostra query `find` originale funzionerà in entrambi i casi:
 
 	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
 
-Scoprirete presto che gli array di valori sono molto più convenienti da usare che non le join molti-a-molti tra più tabelle.
+Scoprirete presto che gli array di valori sono molto più convenienti che non le join molti-a-molti tra più tabelle.
 
-Oltre agli array Mongo supporta i documenti incorporati. Provate a inserire un documento che abbia a sua volta un documento incorporato, come per esempio:
+Oltre agli array Mongo supporta i documenti incorporati. Provate a inserire un documento che a sua volta incorpori un altro documento, come per esempio:
 
 	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d734"), name: 'Ghanima', family: {mother: 'Chani', father: 'Paul', brother: ObjectId("4d85c7039ab0fd70a117d730")}})
 
@@ -343,37 +340,37 @@ Nel caso ve lo stiate chiedendo, i documenti incorporati possono essere cercati 
 
 	db.employees.find({'family.mother': 'Chani'})
 
-Discuteremo brevemente di quale sia il ruolo dei documenti incorporati e del come andrebbero usati.
+Tratteremo brevemente il ruolo dei documenti incorporati e l'uso che se ne drovrebbe fare.
 
 #### DBRef ####
-MongoDB supporta qualcosa noto come `DBRef`, che non è altro che una convenzione supportata da molti driver. Quando un driver incontra un `DBRef` può richiamare automaticamente il documento referenziato. Un `DBRef` include la collezione e l'id del documento a cui si fa riferimento. Di solito si usa in un caso specifico: quando documenti dalla stessa collezione possono far riferimento a documenti che appartengono a collezioni diverse l'una dall'altra. Per sempio il `DBRef` per ducomento1 potrebbe puntare a un documento contenuto in `managers` mentre per documento2 potrebbe puntare a un documento in `employees`.
+MongoDB supporta un aggeggio noto chiamato `DBRef`, che altro non è che una convenzione supportata da molti driver. Quando un driver incontra un `DBRef` può richiamare automaticamente il documento referenziato. Un `DBRef` include il nome della collezione e l'id del documento a cui fa riferimento. Di solito si usa in un caso specifico: quando documenti dalla stessa collezione possono far riferimento a documenti che appartengono a collezioni diverse l'una dall'altra. Per esempio il `DBRef` di documento1 potrebbe puntare a un documento contenuto in `managers`, mentre quello di documento2 potrebbe puntare a un documento in `employees`.
 
 
 #### Denormalizzazione ####
-Un'altra alternativa alle join denormalizzare i dati. In passato la denormalizzazione è sempre stata riservata alle ottimizzazioni della performance, oppure ci si ricorreva quando era necessario creare degli snapshot dei dati (come in un log di revisione). Tuttavia, con la popolarità crescente dei NoSQL, molti dei quali non hanno join, la denormalizzazione come parte integrante della modellazione dei dati sta diventanto sempre più frequente. Ciò non significa che è necessario duplicare ogni informazione in ogni documento. Tuttavia, piuttosto che lasciare che la paura di duplicare dati guidi il design, provate a modellare i dati basandovi su quale informazione appartiene a quale documento.
+Un'altra alternativa alle join consiste nel denormalizzare i dati. In passato la denormalizzazione è sempre stata riservata alle ottimizzazioni della performance, oppure ci si ricorreva quando era necessario creare degli snapshot dei dati (come nel caso dei log di revisione). Tuttavia con la popolarità crescente dei NoSQL, molti dei quali non hanno join, la denormalizzazione come parte integrante della modellazione dei dati si sta facendo sempre più frequente. Ciò non significa che è necessario duplicare ogni informazione in ogni documento. Tuttavia, piuttosto che lasciare che la paura di duplicare dati vi guidi nel design, provate a modellare i dati basandovi su quale informazione appartiene a quale documento.
 
-Per esempio, immaginate di essere al lavoro su un forum. Il modo tradizionale di associare uno specifico `user` a un `post` è per via di una colonna `userid` nella tabella `users`. Una possibile alternativa è semplicimente memorizzare sia il nome (`name`) che il `userid` con ogni `post`. Potreste usare addirittura un documento incorporato, come: `user: {id: ObjectId('Something'), name: 'Leto'}`. Si, se consentite il cambio del nome agli utenti dovrete aggiornare ogni documento (il che significa 1 query aggiuntiva). 
+Per esempio immaginate di essere al lavoro su un forum. Il modo tradizionale di associare uno specifico `user` a un `post` è per via di una colonna `userid` nella tabella `posts`. Una alternativa possibili è quella di memorizzare semplicemente sia il nome (`name`) che il `userid` in ogni `post`. Potreste usare addirittura un documento incorporato, come: `user: {id: ObjectId('Something'), name: 'Leto'}`. E' vero, se consentite il cambio del nome degli utenti allora dovrete aggiornare ogni documento (il che significa una query aggiuntiva). 
 
-Adattarsi a questo tipo di approccio non risulterà semplice per qualcuno di noi. In molti casi non avrà nemmeno senso. Non abbiate paura di sperimentare quest'approccio, però. Non solo è adattabile ad alcune circostanze, ma potrebbe essere addirittura la cosa giusta da fare.
+Per alcuni di noi adattarsi a questo tipo di approccio non sarà una passeggiata. In molti casi non avrà effettivamente senso. Tuttavia non abbiate timore di sperimentarlo. Non solo è adattabile a diverse circostanze, ma addirittura potrebbe risultare la cosa giusta da fare.
 
 #### Quale Scegliere? ####
-Gli arrray di id sono sempre una strategia utile quando abbiamo a che fare con scenari uno-a-molti o molti-a-molti. E' probabilmente il caso di dire che i `DBRef` non sono usati spesso, anche se potete senz'altro giocarci un pò. Tutto spesso lascia i nuovi sviluppatori col dubbio se usare i documenti incorporati o piuttosto ricorrere ai riferimenti manuali.
+Gli arrray di id sono sempre una strategia utile quando abbiamo a che fare con scenari uno-a-molti o molti-a-molti. E' probabilmente il caso di ammettere che i `DBRef` non sono usati di frequente, ma se siete senz'altro liberi giocarci un pò. I nuovi sviluppatori si domandano spesso cosa sia meglio tra documenti incorporati e riferimenti manuali.
 
-Prima di tutto dovete sapere che i singoli documenti sono attualmente limitati a 16 megabyte. Sapere che c'è un limite alla dimensione dei documenti, benché piuttosto ampio, aiuta a farsi una idea di come andrebbero usati. Al momento pare che gran parte dei programmatori ricorra pesantemente ai riferimenti diretti per la gran parte delle loro relazioni. I documenti incorporati sono molto usati, ma per blocchi di dati relativamente piccoli, che vogliamo sempre richiamare assieme al documento principale. Un esempio reale che ho usato in passato è il salvataggio di un documento `accounts` per ogni utente, qualcosa tipo:
+Prima di tutto sappiate che al momento i singoli documenti hanno un limite a 16 megabyte. Sapere che c'è un limite alla dimensione dei documenti, benché piuttosto ampio, aiuta a farsi unaa idea di bisognerebbe usarli. Al momento pare che gran parte dei programmatori ricorra pesantemente ai riferimenti diretti per la maggioranza delle relazioni. I documenti incorporati sono molto usati, ma per blocchi di dati relativamente piccoli, che si vogliono sempre richiamare col documento principale. Un esempio reale che ho usato in passato è il salvataggio di un documento `accounts` per ogni utente, qualcosa tipo:
 
 	db.users.insert({name: 'leto', email: 'leto@dune.gov', account: {allowed_gholas: 5, spice_ration: 10}})
 
-Questo non significa che dovreste sottovalutare la potenza dei documenti incorporati, o classificarli come una utility di secondaria importanza. Avere un modello dati mappato direttamente sugli oggetti rende tutto molto semplice e spesso elimina la necessità di join. Ciò è specialmente vero considerando che MongoDB consente di cercare e indicizzare sui campi di un documento incorporato.
+Questo non significa che dovreste sottovalutare la potenza dei documenti incorporati, o derubricarli a utility di importanza secondaria. Avere un modello dati mappato direttamente sugli oggetti rende tutto molto semplice e spesso elimina la necessità di join, il che è particolarmente vero visto che MongoDB permette ricerche e indicizzazioni sui campi di un documento incorporato.
 
 ### Poche o Tante Collezioni ###
-Dato che le collezioni non obbligano ad alcuno schema, è ovviamente possibile costruire un sistema che usa una sola collezione contenente un guazzabuglio di oggetti diversi. Per quanto ho visto, la maggior parte dei sistemi MongoDB è disposto in maniera simile a quel che trovereste in un sistema relazionale. In altre parole, se avrebbe una tabella in un database relazione, è probabile che avrà una collezione in MongoDB (le tabelle per relazioni molti-a-molti in questo caso sono una eccezione importante).
+Dato che le collezioni non sono obbligano a schema obbligato è ovviamente possibile concepire un sistema con una sola collezione contenente oggetti di ogni tipo. Per quanto ho visto io la maggior parte dei sistemi MongoDB è disposto in maniera simile a quella che troviamo in un sistema relazionale. In altre parole se in un database relazione ci vorrebbe una tabella, allora è probabile in MongoDB che ci voglia una collezione (in questo caso le tabelle per relazioni molti-a-molti sono una importante eccezione).
 
 La faccenda si fa ancor più interessante prendendo in considerazione i documenti incorporati. L'esempio più usato è il blog. Dovremmo avere una collezione `posts` e una collezione `comments`, oppure dovremmo far si che ogni `post` abbia una array di `comments` incorporati? Lasciando da parte il limite dei 16MB (tutto l'Amleto è meno di 200KB, quanto è famoso il vostro blog?) la maggior parte degli sviluppatori preferiscono separare le cose. E' semplicemente più limpido ed esplicito.
 
 Non ci sono regole precise (a parte la faccenda dai 16MB). Giocate con i diversi approcci e capirete presto cosa ha senso e cosa non funziona nel vostro caso.
 
 ### Riepilogo ###
-In questo capitolo il nostro scopo era fornire delle linee guida utili alla modellazione dati con MongoDB. Un punto di partenza se volete. La modellazione in un sistema document-oriented è cosa diversa, ma non troppo, dal mondo relazionale. C'è un pò più di flessibilità e un vincolo in più ma, per essere un nuovo sistema, le cose sembrano aggiustarsi piuttosto bene. L'unico modo di sbagliare è non provarci nemmeno.
+In questo capitolo il nostro scopo era fornire delle linee guida utili alla modellazione dati in MongoDB. Un punto di partenza, se volete. La modellazione in un sistema orientato ai documenti è cosa diversa, ma non troppo, da quella nel mondo relazionale. C'è un pò più di flessibilità e un vincolo in più ma, per essere un nuovo sistema, le cose sembrano aggiustarsi piuttosto bene. L'unico modo di sbagliare è non provarci nemmeno.
 
 \clearpage
 
