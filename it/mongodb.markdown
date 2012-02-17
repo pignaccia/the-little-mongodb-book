@@ -439,15 +439,15 @@ Il messaggio da cogliere da questo capitolo è che nella maggior parte dei casi 
 
 \clearpage
 
-## Chapter 6 - MapReduce ##
-MapReduce è un approccio all'elaborazione dati che vanta due vantaggi significativi rispetto alle altre soluzione più tradizionali. Il primo, e più importante, sono le performance. In linea teorica MapReduce può essere parallelizzato, il che permette l'elaborazione di set di dati molto grandi su più cores/CPU/computers. Come abbiamo già visto attualmente MongoDB non è in grado di sfruttare appieno questo aspetto. Rispetto a quel che è possibile fare via SQL, il codice di MapReduce è infinitamente più ricco e ci permette di spingergi molto avanti prima che una soluzione ancora più specializzata si renda necessaria.
+## Capitolo 6 - MapReduce ##
+MapReduce è un approccio all'elaborazione dati che vanta due vantaggi significativi rispetto alle altre soluzioni tradizionali. Il primo, e più importante, è la performance. In linea teorica MapReduce può operare in parallelo elaborando grandi set di dati contemporaneamente su più cores/CPU/computers. Come abbiamo già visto però, attualmente MongoDB non è in grado di sfruttare pienamento questo aspetto. Rispetto a quel che è possibile fare con SQL, il codice di MapReduce è infinitamente più ricco e ci permette di spingerci molto avanti prima che una soluzione ancor più specializzata si renda necessaria.
 
-La popolarità del modello MapReduce è cresciuta molto, ed è ora possibile usarlo praticamente ovunque; C#, Riby, Java, Python e così via, tutti ne offrono l'implementazione. Preferisco avvirsarmi, inizialmente tutto questo sembrerà molto diverso dal solito e piuttosto complicato. Non fatevi abbattere, prendetevi il tempo di sperimentare voi stessi. Vale la pena capire MapReduce a prescindere dal fatto che userete MongoDB o meno.
+La popolarità del modello MapReduce è cresciuta molto, ed è ora possibile usarlo praticamente ovunque; C#, Ruby, Java, Python e così via, tutti ne offrono una implementazione. Vi avverto, all'inizio MapReduce sembrerà molto diverso da ciò a cui siete abituati, e piuttosto complicato. Non demoralizzatevi, prendetevi il tempo di sperimentare voi stessi. Vale la pena comprendere MapReduce a prescindere dal fatto che lo usiate con MongoDB o meno.
 
-### Un Mix di Teoria e Pratic ###
-MapReduce è un processo a due fasi. Prima si mappa (map) e poi si riduce (reduce). Il mapping trasforma i documenti in input ed emette una coppia chiave=>valore (chiave e valore possono essere complessi). La reduce prende una chiavee l'array dei valori abbinati a quella chiave e produce il risultato finale. Affronteremo entrambe le fasi e il rispettivo output.
+### Teoria e Pratica ###
+MapReduce è un processo in due fasi. Prima si mappa (map) e poi si riduce (reduce). Il mapping trasforma i documenti del flusso di input emettendo una coppia chiave=>valore (chiave e valore possono essere complessi). La reduce prende la chiave e l'array di valori ad essa abbinati e li usa per produrre il risultato finale. Affronteremo entrambe le fasi vedendo l'output di ognuna.
 
-L'esempio che useremo è la generazione di un report col numero di viste (hits), per giorno, che otteniamo per una data risorsa (diciamo una pagina web). E' il *hello world* del MapReduce. Per raggiungere il nostro scopo ci affideremo a una collezione `hits` che conterrà due campi: `resource` e `date`. L'output che vogliamo ottenere è un elenco con le seguenti colonne:  `resource`, `year`, `month`, `day` e `count`.
+L'esempio che useremo è la generazione di un report col numero di viste (hits) giornaliere che otteniamo per una data risorsa (diciamo una pagina web). E' il *hello world* del MapReduce. Per raggiungere il nostro scopo ci affideremo a una collezione `hits` che conterrà due campi: `resource` (risorsa) e `date`. L'output che vogliamo ottenere è un elenco con le seguenti colonne:  `resource`, `year`, `month`, `day` e `count`.
 
 Dati i seguenti contenuti di `hits`:
 
@@ -472,11 +472,11 @@ Desideriamo ottenere i seguenti risultati:
 	index     2010   1       21    2
 	index     2010   1       22    1
 
-La cosa bella di un approccio di questo tipo è che, salvando l'output, i report sono veloci da generare e la crescita dei dati è controllata (per ogni risorsa che tracciamo aggiungeremo non più di 1 documento al giorno)
+La cosa bella di questo tipo di approccio  è che, salvando l'output, i report sono veloci da generare e la crescita dei dati è controllata (per ogni risorsa che tracciamo aggiungeremo non più di 1 documento al giorno)
 
-Per il momento concentriamoci sul concetto. Alla fine di questo capitolo vi fornirò dei dati e del codice di esempio da usare per fare degli esperimenti per conto vostro.
+Per il momento concentriamoci sul concetto. Alla fine di questo capitolo vi fornirò dati e codice di esempio da usare per fare esperimenti per conto vostro.
 
-La prima cosa da fare è affrontare la funzione map. L'obiettivo della map è emettere un valore che può essere ridotto. E' possibile che map emetta 0 o piu risultati. Nel nostro caso emettera un risultato (cosa che capita spesso). Immaginiamo la map come un ciclo che scorre i documenti della collezione hits. Per ogni documento vogliamo emettere una chiave con resource, year, month e day, ed un semplice valore 1:
+Per prima cosa affrontiamo la funzione map. L'obiettivo della map è emettere un valore che può essere ridotto. E' possibile che map emetta 0 o piu risultati. Nel nostro caso emetterà un solo risultato (cosa che capita spesso). Immaginiamo la map come un ciclo che scorre i documenti della collezione hits. Per ogni documento vogliamo emettere una chiave con resource, year, month e day, ed un semplice valore 1:
 
 	function() {
 		var key = {
@@ -488,7 +488,7 @@ La prima cosa da fare è affrontare la funzione map. L'obiettivo della map è em
 		emit(key, {count: 1}); 
 	}
 
-`this` fa riferimento al documento trattato al momento. Vedere l'output del mapping dovrebbe agevolare la comprensione del procedimento. Usando i dati visti sopra, l'output completo sarebbe:
+`this` fa riferimento al documento trattato al momento. Vedere l'output del nostro mapping agevolerà la comprensione del procedimento. Usando i dati visti sopra, l'output completo sarebbe:
 
 	{resource: 'index', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
 	{resource: 'about', year: 2010, month: 0, day: 20} => [{count: 1}]
@@ -496,7 +496,7 @@ La prima cosa da fare è affrontare la funzione map. L'obiettivo della map è em
 	{resource: 'index', year: 2010, month: 0, day: 21} => [{count: 1}, {count: 1}]
 	{resource: 'index', year: 2010, month: 0, day: 22} => [{count: 1}]
 
-Capire questo passagio intermedio è la chiave per comprendere MapReduce. I valori della emit sono raggruppati, in forma di array, per ogni chiave. Gli sviluppatori .NET e Java possono immaginare che si tratti del tipo: `IDictionary<object, IList<object>>` (.NET) oppure `HashMap<Object, ArrayList>` (Java).
+Capire questo passagio intermedio è la chiave per comprendere MapReduce. I valori della emit sono raggruppati, in forma di array, per ogni chiave. Gli sviluppatori .NET e Java possono immaginare che si tratti di qualcosa del tipo: `IDictionary<object, IList<object>>` (.NET) oppure `HashMap<Object, ArrayList>` (Java).
 
 Cambiamo la nosta map function in modo piuttosto artificioso:
 
@@ -515,7 +515,7 @@ Il primo output intermedio cambierebbe in:
 
 Notate come ogni emit genera un nuovo valore che è raggruppato in base alla nostra chiave (key).
 
-La funzione reduce prende ognuno di questi risultati intermedi e genera l'output finale. Ecco come appare la nostra funzione:
+La funzione reduce prende ognuno di questi risultati intermedi e genera l'output finale. Ecco come appare la nostra funzione reduce:
 
 	function(key, values) {
 		var sum = 0;
@@ -539,7 +539,7 @@ Tecnicamente, l'output in MongoDB è:
 
 Avrete notato che questo è proprio il risultato finale che stavamo cercando.
 
-Se avete prestato attenzione, forse vi sarete chiesti *perché non abbiamo usato semplicemente `sum = values.length`?* Sembrerebbe un approccio efficace visto che stiamo essenzialmente sommando un array di 1. Il fatto è che non sempre reduce è usato con un set di dati intermedi perfetti e completi. Per esempio, se invece di essere chiamato con:
+Se avete prestato attenzione vi sarete forse chiesti *perché non abbiamo usato semplicemente `sum = values.length`?* Sembrerebbe un approccio efficace visto che stiamo essenzialmente sommando un array di 1. Il fatto è che non sempre reduce è usato con un set di dati intermedi perfetti e completi. Per esempio, se invece di essere chiamato con:
 
 	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
 
@@ -548,12 +548,12 @@ Reduce fosse chiamato con:
 	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}]
 	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 2}, {count: 1}]
 
-L'ouput finale è lo stesso (3), il percorso fatto è semplicemente diverso. Per questo motivo reduce deve esempre essere idempotente, il che significa che chiamare reduce piè volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
+L'ouput finale è lo stesso (3) ma il percorso fatto è, semplicemente, diverso. Per questo motivo reduce deve esempre essere idempotente, il che significa che chiamare reduce più volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
 
 Non lo faremo qui, ma è frequente concatenare metodi reduce quando si eseguono analisi più complesse.
 
 ### Pratica Pura ###
-Con MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta una funzione map, una funzione reduce e una direttiva di output. Nella nostra scell possiamo creare e passare una funzione JavaScript. Con la maggior parte delle librerie potete passare una stringa che contiene le vostre funzioni (il che è piuttosto brutto). Prima di tutto creiamo il nostro semplice set di dati:
+Con MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta una funzione map, una funzione reduce e una direttiva di output. Nella nostra shell possiamo creare e passare una funzione JavaScript. Con la maggior parte delle librerie potete passare una stringa che contiene le vostre funzioni (il che è piuttosto brutto). Prima di tutto creiamo il nostro semplice set di dati:
 
 	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 4, 30)});
 	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 5, 30)});
@@ -566,7 +566,7 @@ Con MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta
 	db.hits.insert({resource: 'index', date: new Date(2010, 0, 21, 9, 30)});
 	db.hits.insert({resource: 'index', date: new Date(2010, 0, 22, 5, 0)});
 
-Ora possiamo creare le nostre funzioni map e reduce (la shell MongoDB accetta comandi multi-riga, vedrai apparire *...* dopo la pressione di invio ad indicare che ci si aspetta altro testo)
+Ora possiamo creare le nostre funzioni map e reduce (la shell MongoDB accetta comandi multi-riga, vedrete apparire *...* dopo la pressione di invio ad indicare che ci si aspetta altro testo)
 
 	var map = function() {
 		var key = {resource: this.resource, year: this.date.getFullYear(), month: this.date.getMonth(), day: this.date.getDate()};
@@ -585,17 +585,17 @@ Ora possiamo lanciare il comando `mapReduce` sulla nostra collezione `hits`:
 
 	db.hits.mapReduce(map, reduce, {out: {inline:1}})
 
-Se eseguite il comando qui sopra dovreste ottenere il risultato desiderato. Impostare `out` a `inline` signica che l'output da `mapReduce` ci è immediatamente restituito. Attualmente c'è un limite a 16 megabyte o meno per gli output di questo tipo. Potremmo invece specificare `{out: 'hit_stats'}` per ottenere i risultati nella nuova collezione `hit_statis`:
+Eseguendo il comando qui sopra dovreste ottenere il risultato desiderato. Impostare `out` a `inline` comporta che l'output di `mapReduce` ci venga immediatamente restituito. Attualmente c'è un limite a 16 megabyte o meno per gli output di questo tipo. Potremmo invece specificare `{out: 'hit_stats'}` per inviare i risultati alla nuova collezione `hit_statis`:
 
 	db.hits.mapReduce(map, reduce, {out: 'hit_stats'});
 	db.hit_stats.find();
 
-Facendo questo, eventuali dati esistenti in `hit_stats` vanno perduti. Se facessimo `{out: {merge: 'hit_stats'}}` le chiavi esistenti verrebbero aggiornate coi nuovi valori e le nuove chiavi verrebbero inserite come nuovi documenti. Potremmo infine fare `out` su una funzione `reduce` per gestire casi più avanzati (come una upsert)
+Facendo questo eventuali dati esistenti in `hit_stats` andranno perduti. Se facessimo `{out: {merge: 'hit_stats'}}` le chiavi esistenti verrebbero aggiornate coi nuovi valori e le nuove chiavi verrebbero inserite come nuovi documenti. Potremmo infine fare `out` su una funzione `reduce` per gestire casi più avanzati (come una upsert)
 
-Il terzo parametro accetta opzioni aggiuntive, potremmo per esempio filtrare, ordinare e limitare i documenti che vogliamo analizzare. Possiamo inoltre fornire un metodo `finalize` da applciare ai risultati dopo la fase `reduce`.
+Il terzo parametro accetta opzioni aggiuntive, potremmo per esempio filtrare, ordinare e limitare i documenti che vogliamo analizzare. Possiamo inoltre fornire un metodo `finalize` da applciare ai risultati successivamente alla fase `reduce`.
 
 ### Riepilogo ###
-Questo è il primo capitolo in cui abbiamo affrontato qualcosa di veramente diverso dal solito. Se vi siete trovati a disagio, tenete presente che potete sempre ricorrere alle altre [capacità di aggregazione](http://www.mongodb.org/display/DOCS/Aggregation) offerte da MongoDB, adatte a scenari più semplicei. In fin dei conti MapReduce è una delle caratteristiche più accattivanti di MongoDB. La chiave per comprendere a fondo come scrivere le vostre funzioni di map e reduce è visualizzare e comprendere l'aspetto che i dati intermedi assumeranno all'uscita della `map`, pronti per passare alla `reduce`
+Questo è il primo capitolo in cui abbiamo affrontato qualcosa di veramente diverso dal solito. Se vi siete trovati a disagio, tenete presente che potete sempre ricorrere alle altre [capacità di aggregazione](http://www.mongodb.org/display/DOCS/Aggregation) offerte da MongoDB, adatte a scenari più semplici (. In fin dei conti MapReduce è una delle caratteristiche più accattivanti di MongoDB. La chiave per comprendere a fondo come scrivere le vostre funzioni di map e reduce è visualizzare e comprendere l'aspetto che i dati intermedi assumeranno all'uscita della `map`, pronti per passare alla `reduce`.
 
 \clearpage
 
