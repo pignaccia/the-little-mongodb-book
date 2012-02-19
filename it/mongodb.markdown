@@ -439,171 +439,11 @@ Il messaggio da cogliere da questo capitolo è che nella maggior parte dei casi 
 
 \clearpage
 
-## Capitolo 6 - MapReduce ##
-MapReduce è un approccio all'elaborazione dati che vanta due vantaggi significativi rispetto alle altre soluzioni tradizionali. Il primo, e più importante, è la performance. In linea teorica MapReduce può operare in parallelo elaborando grandi set di dati contemporaneamente su più cores/CPU/computers. Come abbiamo già visto però, attualmente MongoDB non è in grado di sfruttare pienamento questo aspetto. Rispetto a quel che è possibile fare con SQL, il codice di MapReduce è infinitamente più ricco e ci permette di spingerci molto avanti prima che una soluzione ancor più specializzata si renda necessaria.
-
-La popolarità del modello MapReduce è cresciuta molto, ed è ora possibile usarlo praticamente ovunque; C#, Ruby, Java, Python e così via, tutti ne offrono una implementazione. Vi avverto, all'inizio MapReduce sembrerà molto diverso da ciò a cui siete abituati, e piuttosto complicato. Non demoralizzatevi, prendetevi il tempo di sperimentare voi stessi. Vale la pena comprendere MapReduce a prescindere dal fatto che lo usiate con MongoDB o meno.
-
-### Teoria e Pratica ###
-MapReduce è un processo in due fasi. Prima si mappa (map) e poi si riduce (reduce). Il mapping trasforma i documenti del flusso di input emettendo una coppia chiave=>valore (chiave e valore possono essere complessi). La reduce prende la chiave e l'array di valori ad essa abbinati e li usa per produrre il risultato finale. Affronteremo entrambe le fasi vedendo l'output di ognuna.
-
-L'esempio che useremo è la generazione di un report col numero di viste (hits) giornaliere che otteniamo per una data risorsa (diciamo una pagina web). E' il *hello world* del MapReduce. Per raggiungere il nostro scopo ci affideremo a una collezione `hits` che conterrà due campi: `resource` (risorsa) e `date`. L'output che vogliamo ottenere è un elenco con le seguenti colonne:  `resource`, `year`, `month`, `day` e `count`.
-
-Dati i seguenti contenuti di `hits`:
-
-	resource     date
-	index        Jan 20 2010 4:30
-	index        Jan 20 2010 5:30
-	about        Jan 20 2010 6:00
-	index        Jan 20 2010 7:00
-	about        Jan 21 2010 8:00
-	about        Jan 21 2010 8:30
-	index        Jan 21 2010 8:30
-	about        Jan 21 2010 9:00
-	index        Jan 21 2010 9:30
-	index        Jan 22 2010 5:00
-
-Desideriamo ottenere i seguenti risultati:
-
-	resource  year   month   day   count
-	index     2010   1       20    3
-	about     2010   1       20    1
-	about     2010   1       21    3
-	index     2010   1       21    2
-	index     2010   1       22    1
-
-La cosa bella di questo tipo di approccio  è che, salvando l'output, i report sono veloci da generare e la crescita dei dati è controllata (per ogni risorsa che tracciamo aggiungeremo non più di 1 documento al giorno)
-
-Per il momento concentriamoci sul concetto. Alla fine di questo capitolo vi fornirò dati e codice di esempio da usare per fare esperimenti per conto vostro.
-
-Per prima cosa affrontiamo la funzione map. L'obiettivo della map è emettere un valore che può essere ridotto. E' possibile che map emetta 0 o piu risultati. Nel nostro caso emetterà un solo risultato (cosa che capita spesso). Immaginiamo la map come un ciclo che scorre i documenti della collezione hits. Per ogni documento vogliamo emettere una chiave con resource, year, month e day, ed un semplice valore 1:
-
-	function() {
-		var key = {
-		    resource: this.resource, 
-		    year: this.date.getFullYear(), 
-		    month: this.date.getMonth(), 
-		    day: this.date.getDate()
-		};
-		emit(key, {count: 1}); 
-	}
-
-`this` fa riferimento al documento trattato al momento. Vedere l'output del nostro mapping agevolerà la comprensione del procedimento. Usando i dati visti sopra, l'output completo sarebbe:
-
-	{resource: 'index', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
-	{resource: 'about', year: 2010, month: 0, day: 20} => [{count: 1}]
-	{resource: 'about', year: 2010, month: 0, day: 21} => [{count: 1}, {count: 1}, {count:1}]
-	{resource: 'index', year: 2010, month: 0, day: 21} => [{count: 1}, {count: 1}]
-	{resource: 'index', year: 2010, month: 0, day: 22} => [{count: 1}]
-
-Capire questo passagio intermedio è la chiave per comprendere MapReduce. I valori della emit sono raggruppati, in forma di array, per ogni chiave. Gli sviluppatori .NET e Java possono immaginare che si tratti di qualcosa del tipo: `IDictionary<object, IList<object>>` (.NET) oppure `HashMap<Object, ArrayList>` (Java).
-
-Cambiamo la nosta map function in modo piuttosto artificioso:
-
-	function() {
-		var key = {resource: this.resource, year: this.date.getFullYear(), month: this.date.getMonth(), day: this.date.getDate()};
-		if (this.resource == 'index' && this.date.getHours() == 4) {
-			emit(key, {count: 5});
-		} else {
-			emit(key, {count: 1}); 
-		}
-	}
-
-Il primo output intermedio cambierebbe in:
-
-	{resource: 'index', year: 2010, month: 0, day: 20} => [{count: 5}, {count: 1}, {count:1}]
-
-Notate come ogni emit genera un nuovo valore che è raggruppato in base alla nostra chiave (key).
-
-La funzione reduce prende ognuno di questi risultati intermedi e genera l'output finale. Ecco come appare la nostra funzione reduce:
-
-	function(key, values) {
-		var sum = 0;
-		values.forEach(function(value) {
-			sum += value['count'];
-		});
-		return {count: sum};
-	};
-
-Che restituisce l'output seguente:
-
-	{resource: 'index', year: 2010, month: 0, day: 20} => {count: 3}
-	{resource: 'about', year: 2010, month: 0, day: 20} => {count: 1}
-	{resource: 'about', year: 2010, month: 0, day: 21} => {count: 3}
-	{resource: 'index', year: 2010, month: 0, day: 21} => {count: 2}
-	{resource: 'index', year: 2010, month: 0, day: 22} => {count: 1}
-
-Tecnicamente, l'output in MongoDB è:
-
-	_id: {resource: 'home', year: 2010, month: 0, day: 20}, value: {count: 3}
-
-Avrete notato che questo è proprio il risultato finale che stavamo cercando.
-
-Se avete prestato attenzione vi sarete forse chiesti *perché non abbiamo usato semplicemente `sum = values.length`?* Sembrerebbe un approccio efficace visto che stiamo essenzialmente sommando un array di 1. Il fatto è che non sempre reduce è usato con un set di dati intermedi perfetti e completi. Per esempio, se invece di essere chiamato con:
-
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
-
-Reduce fosse chiamato con:
-
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}]
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 2}, {count: 1}]
-
-L'ouput finale è lo stesso (3) ma il percorso fatto è, semplicemente, diverso. Per questo motivo reduce deve esempre essere idempotente, il che significa che chiamare reduce più volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
-
-Non lo faremo qui, ma è frequente concatenare metodi reduce quando si eseguono analisi più complesse.
-
-### Pratica Pura ###
-Con MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta una funzione map, una funzione reduce e una direttiva di output. Nella nostra shell possiamo creare e passare una funzione JavaScript. Con la maggior parte delle librerie potete passare una stringa che contiene le vostre funzioni (il che è piuttosto brutto). Prima di tutto creiamo il nostro semplice set di dati:
-
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 4, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 5, 30)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 20, 6, 0)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 7, 0)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 8, 0)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 8, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 21, 8, 30)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 9, 0)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 21, 9, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 22, 5, 0)});
-
-Ora possiamo creare le nostre funzioni map e reduce (la shell MongoDB accetta comandi multi-riga, vedrete apparire *...* dopo la pressione di invio ad indicare che ci si aspetta altro testo)
-
-	var map = function() {
-		var key = {resource: this.resource, year: this.date.getFullYear(), month: this.date.getMonth(), day: this.date.getDate()};
-		emit(key, {count: 1}); 
-	};
-	
-	var reduce = function(key, values) {
-		var sum = 0;
-		values.forEach(function(value) {
-			sum += value['count'];
-		});
-		return {count: sum};
-	};
-
-Ora possiamo lanciare il comando `mapReduce` sulla nostra collezione `hits`:
-
-	db.hits.mapReduce(map, reduce, {out: {inline:1}})
-
-Eseguendo il comando qui sopra dovreste ottenere il risultato desiderato. Impostare `out` a `inline` comporta che l'output di `mapReduce` ci venga immediatamente restituito. Attualmente c'è un limite a 16 megabyte o meno per gli output di questo tipo. Potremmo invece specificare `{out: 'hit_stats'}` per inviare i risultati alla nuova collezione `hit_statis`:
-
-	db.hits.mapReduce(map, reduce, {out: 'hit_stats'});
-	db.hit_stats.find();
-
-Facendo questo eventuali dati esistenti in `hit_stats` andranno perduti. Se facessimo `{out: {merge: 'hit_stats'}}` le chiavi esistenti verrebbero aggiornate coi nuovi valori e le nuove chiavi verrebbero inserite come nuovi documenti. Potremmo infine fare `out` su una funzione `reduce` per gestire casi più avanzati (come una upsert)
-
-Il terzo parametro accetta opzioni aggiuntive, potremmo per esempio filtrare, ordinare e limitare i documenti che vogliamo analizzare. Possiamo inoltre fornire un metodo `finalize` da applciare ai risultati successivamente alla fase `reduce`.
-
-### Riepilogo ###
-Questo è il primo capitolo in cui abbiamo affrontato qualcosa di veramente diverso dal solito. Se vi siete trovati a disagio, tenete presente che potete sempre ricorrere alle altre [capacità di aggregazione](http://www.mongodb.org/display/DOCS/Aggregation) offerte da MongoDB, adatte a scenari più semplici (. In fin dei conti MapReduce è una delle caratteristiche più accattivanti di MongoDB. La chiave per comprendere a fondo come scrivere le vostre funzioni di map e reduce è visualizzare e comprendere l'aspetto che i dati intermedi assumeranno all'uscita della `map`, pronti per passare alla `reduce`.
-
-\clearpage
-
 ## Chapter 7 - Performance e Strumenti ##
-In quest'ultimo capitolo tratteremo le questioni di performance e daremo una occhiata ad alcuni strumenti (tools) disponibili per gli sviluppatori MongoDB. Per ognuno di questi argomenti esamineremo gli aspetti più importanti, senza scendere troppo in dettaglio.
+In quest'ultimo capitolo tratteremo le questioni di performance e daremo una occhiata ad alcuni strumenti a disposizione degli sviluppatori MongoDB. Per ognuno degli argomenti esamineremo gli aspetti più importanti, senza scendere troppo in dettaglio.
 
 ### Indici ###
-All'inizio del libro abbiamo incontrato la collezione speciale `system.indexes` che contiene informazioni su tutti gli indici del nostro database. Gli indici in MongoDB funzionano in molto maniera simile a quella dei database relazionali: migliorano la performance di ricerche e ordinamenti. Gli indici vengono creati con `ensureIndex`:
+All'inizio del libro abbiamo incontrato la collezione speciale `system.indexes` che contiene informazioni su tutti gli indici del nostro database. Gli indici in MongoDB funzionano in maniera molto simile a quella dei database relazionali: migliorano le performance di ricerche e ordinamenti. Gli indici vengono creati con `ensureIndex`:
 
 	db.unicorns.ensureIndex({name: 1});
 
@@ -615,11 +455,11 @@ Un indice univoco si crea passando un secondo parametro e impostando `unique` a 
 
 	db.unicorns.ensureIndex({name: 1}, {unique: true});
 
-Gli indici possono venire creati su campi incorporati (ancora una volta con la notazione col punto) e sugli array. E' anche possibile creare indici compositi:
+Gli indici possono venire creati su campi incorporati (ancora una volta ricorrendo alla notazione col punto) e sugli array. E' anche possibile creare indici compositi:
 
 	db.unicorns.ensureIndex({name: 1, vampires: -1});
 
-L'ordine dell'indice (1 per ascendente, -1 per descendente) non importa per gli indici singoli, ma può avere un impatto sugli indici compositi, quando si fanno ordinamenti applicando condizioni di range (gamma).
+L'ordine dell'indice (1 per ascendente, -1 per descendente) non importa per gli indici singoli, ma può avere un impatto sugli indici compositi, quando si combinano condizioni condizioni di range (gamma) e ordinamenti.
 
 Maggiori informazioni sugli indici sono reperibili sulla [pagina sugli indici](http://www.mongodb.org/display/DOCS/Indexes) del sito ufficiale.
 
@@ -628,33 +468,33 @@ Per capire se le nostre query stanno usando un indice possiamo ricorrere al meto
 
 	db.unicorns.find().explain()
 
-L'output ci dice che è stato usato un `BasicCursor` (che significa non-indicizzato), che 12 oggetti sono stati trattati, quanto tempo c'è voluto, quale indice è stato eventualmente usato, e qualche altra utile informazione.
+L'output ci dice che è stato usato un `BasicCursor` (non-indicizzato), che 12 oggetti sono stati trattati, quanto tempo c'è voluto, quale indice è stato eventualmente usato, e qualche altra informazione utile.
 
-Se facciamo in modo che la nostra query usi un indice scopriremo che è stato usato `BtreeCursor`, e ci verrà detto il nome dell'indice applicato:
+Se facciamo in modo che la nostra query ricorra a un indice scopriremo che è stato usato `BtreeCursor`, e ci verrà detto il nome dell'indice applicato:
 
 	db.unicorns.find({name: 'Pilot'}).explain()
 
 ### Scritture 'Fire and Forget' ###
-Abbiamo già detto prima che, per default, le write in MongoDB sono del tipo fire-and-forget. Questo migliora le performance e anche il rischio di perdita dati nel caso di un crash. Un effetto interessante di questo tipo di scrittura dei dati è il fatto che non viene restituito un errore quando una insert/update viola un vincolo di univocità. Per essere informati sugli errori di scrittura è necessario chiamare esplicitamente il metodo `db.getLastError()` dopo una insert. Molti driver gestiscono internamente (astraggono) questo dettaglio, e forniscono direttamente un metodo per eseguire writes *sicure* - spesso ricorrendo a un parametro extra. 
+Abbiamo già detto prima che, per default, le write in MongoDB sono del tipo fire-and-forget. Questo comporta un miglioramento delle performance al costo di un aumento del rischio di perdita dati in caso di crash. Un effetto interessante di questo tipo di approccio alla scrittura dati è che non viene restituito alcun errore quando una insert/update finisce per violare un vincolo di univocità. Per informarci sugli eventuali errori di scrittura dobbiamo chiamare esplicitamente il metodo `db.getLastError()` dopo una insert. Molti driver gestiscono astraggono questo dettaglio gestendolo internamente, e forniscono un metodo diretto per lanciare scritture *sicure* - spesso ricorrendo a un parametro extra. 
 
 Sfortunamente la shell esegue automaticamente delle scritture sicure, pertanto non possiamo vedere facilmente questo comportamento in azione.
 
 ### Sharding ###
-MongoDB supporta l'auto-sharding. Il Sharding è un approccio alla scalabilità che suddivide i dati su server multipli. Una implementazone banale potrebbe salvare tutti i dati degli utenti con nome che comincia per A-M sul server 1, e il resto sul server2. Per fortuna le capacità di sharding di MongoDB sono nettamente superiori. L'argomento Sharding è ben al di là degli scopi di questo libro, ma sappiate che esiste e che dovreste considerarlo nel caso le vostre necessità vadano oltre il singolo server.
+MongoDB supporta l'auto-sharding. Lo sharding è un approccio alla scalabilità che ripartisce i dati su server multipli. Una implementazone banale potrebbe salvare tutti i dati degli utenti con nome che comincia per A-M sul server 1, e il resto sul server 2. Per fortuna le capacità di sharding di MongoDB sono nettamente superiori. L'argomento Sharding è ben al di là degli scopi di questo libro, ma sappiate che esiste e che dovreste considerarlo nel caso le vostre necessità vadano oltre il singolo server.
 
-### Replication ###
+### Replicazione ###
 La replicazione in MongoDB funziona in modo simile a quella dei database relazionali. Le scritture vengono inviate a un singolo server, il master, che in seguito si sincronizza con uno o più server, gli slave. Possiamo controllare se le letture possono avvenire o meno sugli slave, il che ci può aiutare a distribuire il carico di lavoro correndo però il rischio di leggere dati leggermente obsoleti. Se il master fallisce, uno slave può venir promosso al ruolo di master. Anche la replication è al di là degli scopi di questo libro.
 
 E' vero che la replication può migliorare la performance (distribuendo le letture), ma il suo scopo principale è migliorare l'affidabilità. Combinare replication e sharding è un approccio molto diffuso. Per esempio, ogni shard potrebbe essere configurato con un master e uno slave. (Tecnicamente ci sarà anche bisogno di un arbitro per decidere chi promuovere nel caso di due slave che tentano entrambi di diventare master. Ma un arbitro richiede poche risorse e può essere usato per più shard.)
 
 ### Statistiche ###
-Possiamo ottenere informazioni su un database digitando `db.stats()`. Gran parte delle informazioni riguardano le dimensioni del database. Possiamo anche ottenere informazini su una collection, per esempio `unicorns`, digitando `db.unicorns.stats()`. Anche in questo caso le informazioni riguardano più che altro le dimensioni della nostra collezione.
+Possiamo ottenere informazioni su un database digitando `db.stats()`. Gran parte delle informazioni riguardano le dimensioni del database. Possiamo anche ottenere informazini su una collezione, per esempio `unicorns`, digitando `db.unicorns.stats()`. Anche in questo caso le informazioni riguardano più che altro le dimensioni della nostra collezione.
 
 ### Intefaccia Web ###
-Tra le informazioni disponibili quando abbiamo lanciato MongoDB c'era un link a un tool amministrativo su web (potrebbe essere ancora visibile se fate scorrere la finestra di comando/terminale fino al punto in cui avete lanciato `mongod`). Lo strumento amministrativo è accessibile puntando il browser all'indirizzo <http://localhost:28017/>. Varrà la pena aggiungere `rest=true` al config e riavviare il processo `mongod`. L'interfaccia web fornisce molte informazioni sullo stato del server.
+Tra le informazioni disponibili quando abbiamo lanciato MongoDB c'era un link a uno strumento amministrativo su web (potrebbe essere ancora visibile se fate scorrere la finestra di comando/terminale fino al punto in cui avete lanciato `mongod`). Lo strumento amministrativo è accessibile puntando il browser all'indirizzo <http://localhost:28017/>. Varrà la pena aggiungere `rest=true` al config e riavviare il processo `mongod`. L'interfaccia web fornisce molte informazioni sullo stato del server.
 
 ### Profiler ###
-Possiamo attivare il profile di MongoDB eseguendo:
+Possiamo attivare il profiler di MongoDB eseguendo:
 
 	db.setProfilingLevel(2);
 
@@ -666,17 +506,17 @@ Quindi esaminare il profiler:
 
 	db.system.profile.find()
 
-L'output ci dirà che cosa è stato eseguito e quando, quando documenti sono stati considerati e quanti dati sono stati restituiti.
+L'output ci dirà che cosa è stato eseguito e quando, quanti documenti sono stati considerati e quanti dati sono stati effettivamente restituiti.
 
-Il profiler si disattiva chiamando di nuovo `setProfileLevel` ma questa volta impostando l'argomento a `0`. Un'altra opzione è specificare `1` che profilerà solo le query che richiedono più di 100 millisecondi. Oppure possiamo specificare il tempo minimo, in millisecondi, ricorrendo a un secondo parametro:
+Il profiler si disattiva chiamando di nuovo `setProfileLevel` ma questa volta impostando l'argomento a `0`. Un'altra opzione è specificare `1`, che profilerà solo le query che richiedono più di 100 millisecondi. Oppure possiamo specificare il tempo minimo, in millisecondi, ricorrendo a un secondo parametro:
 
 	//profile per qualunque cosa che impieghi più di 1 secondo
 	db.setProfilingLevel(1, 1000);
 
-### Backups e Restore ###
-Nella cartella `bin` di MongoDB c'è l'eseguibile `mongodump`. Semplicemente lanciandolo, `mongodump` si connetterà al localhost e farà il backup dei database in una sotto-cartella `dump`. Possiamo digitare `mongodump --help` per scoprire le opzioni aggiuntive. Le più comuni sono `--db NOME` per fare il backup di un database specifico e `-- collection NOMECOLLEZIONE` per fare il backup di una collezione specifica. In seguito possiamo ricorrere all'eseguibile `mongorestore`, sempre nella cartella `bin`, per ripristinare un backup precedente. Anche in questo caso possiamo usare `--db` e `--collection` per ripristinare un database o una collezione particolare.
+### Backup e Restore ###
+Nella cartella `bin` di MongoDB c'è l'eseguibile `mongodump`. Semplicemente lanciandolo, `mongodump` si connette al localhost ed esegue il backup dei database in una sotto-cartella `dump`. Possiamo digitare `mongodump --help` per scoprire le opzioni aggiuntive. Le più comuni sono `--db NOME` per fare il backup di uno specifico database e `-- collection NOMECOLLEZIONE` per fare il backup di una certa collezione. Successivamente potremo ricorrere all'eseguibile `mongorestore`, sempre nella cartella `bin`, per ripristinare un backup precedente. Anche in questo caso potremo usare `--db` e `--collection` per ripristinare database o collezione specifici.
 
-Per esempio se volessimo eseguire il backup della collezione `learn` in una cartella `backup`, dovremmo eseguire (questi sono eseguibili indipendenti, non funzioneranno dall'interno della shell di mongo):
+Per esempio se volessimo eseguire il backup della collezione `learn` in una cartella `backup`, dovremmo eseguire (questi sono programmi indipendenti, non funzioneranno dall'interno della shell di mongo):
 
 	mongodump --db learn --out backup
 
@@ -684,7 +524,7 @@ Per ripristinare solo la collezione `unicorns` potremmo eseguire:
 
 	mongorestore --collection unicorns backup/learn/unicorns.bson
 
-Vale la pena ricordare che `mongoexport` e `mongoimport` sono due altri eseguibili che possono essere usati per esportare e importare dati da JSON o CSV. Per esempio possiamo ottenere un output JSON eseguendo:
+Vale la pena ricordare che `mongoexport` e `mongoimport` sono altri due programmi che possono essere usati per esportare e importare dati da JSON o CSV. Per esempio possiamo ottenere un output JSON eseguendo:
 
 	mongoexport --db learn -collection unicorns
 
@@ -695,11 +535,11 @@ E un output CSV eseguendo:
 Tenete presente che `mongoexport` e `mongoimport` non sono sempre in grado di rappresentare i dati. Solo `mongodump` e `mongorestore` dovrebbero essere usati per ottenere dei veri backup.
 
 ### Riepilogo ###
-In questo capitolo abbiamo scoperto vari comandi, strumenti e dettagli sulla performance di MongoDB. Non abbiamo visto tutto, ci siamo limitati quelli usati più spesso. L'indicizzazione in MongoDB è simile a quella dei database relazionali, così come molti gli altri strumenti. In MongoDB tuttavia molti di questi strumenti sono davvero semplici da usare.
+In questo capitolo abbiamo scoperto vari comandi, strumenti e alcuni dettagli relativi alle performance di MongoDB. Non abbiamo visto tutto, ci siamo limitati quelli usati più spesso. L'indicizzazione in MongoDB è simile a quella dei database relazionali, così come molti degli altri strumenti. In MongoDB, tuttavia, molti di questi strumenti sono davvero facili da usare.
 
 \clearpage
 
 ## Conclusione ##
-Ora dovreste essere in possesso di informazioni sufficienti per usare MongoDB in un vero progetto. C'è di più da dire rispetto a quel che abbiamo trattato, ma la priorità ora dovrebbe essere mettere insieme tutto quel che abbiamo imporato e prendere familiarità con il driver che userete. Il [sito MongoDB](http://www.mongodb.com/) è ricco di informazioni utili e il [MongoDB user group ufficiale](http://groups.google.com/group/mongodb-user) è il posto ideale dove fare domande..
+Ora dovreste essere in possesso di informazioni sufficienti per usare MongoDB in un progetto reale. In MongoDB c'è più di quel che abbiamo trattato, ma giunti a questo punto la vostra priorità è mettere a frutto quel che avete imparato e acquisire familiarità col driver che userete. Il [sito MongoDB](http://www.mongodb.com/) è ricco di informazioni utili e il [MongoDB user group ufficiale](http://groups.google.com/group/mongodb-user) è il posto ideale dove porre le vostre domande.
 
-NoSQL è nato non solo per necessità, ma anche dall'interesse nel sperimentare nuovi approcci. E' un dato di fatto che il nostro settore è in continua evoluzione, e che se non tentiamo, a votle fallendo, non otteremo alcun successo. Credo che questo possa essere un buon sistema per condurre la nostra vita professionale.
+NoSQL è nato non solo per necessità ma anche dall'interesse genuino verso la sperimentazione di nuovi approcci. E' risaputo quanto il nostro settore sia in continua evoluzione e che, se non tentiamo, a volte anche fallendo, non otteremo alcun successo. Credo che questo sia un buon approccio per condurre la nostra vita professionale.
