@@ -1,6 +1,6 @@
 \thispagestyle{empty}
 \changepage{}{}{}{-1.5cm}{}{2cm}{}{}{}
-![Il Piccolo Libro su MongoDB, di Karl Seguin](title.png)\ 
+![Il Piccolo Libro su MongoDB, di Karl Seguin](it/title.png)\ 
 
 \clearpage
 \changepage{}{}{}{1.5cm}{}{-2cm}{}{}{}
@@ -30,12 +30,12 @@ L'ultima versione del sorgente di questo libro è disponibile qui:
 <http://github.com/karlseguin/the-little-mongodb-book>.
 
 ### Traduzione italiana ###
-La traduzione italiana del libro è curata da [Nicola Iarocci](http://nicolaiarocci.com). Vi prego di segnalare ogni errore o imprecisione, così da migliorare la qualità della traduzione nel tempo.
+La traduzione italiana di The Little MongoDB Book è curata da [Nicola Iarocci](http://nicolaiarocci.com) ([@nicolaiarocci](https://twitter.com/#!/nicolaiarocci)). Vi prego di segnalare ogni errore o imprecisione, così da migliorare nel tempo la qualità della.
 
 \clearpage
 
 ## Introduzione ##
- > Non è colpa mia se i capitoli sono brevi, MongoDB è davvero così semplice da imparare.
+ > Non è colpa mia se i capitoli sono brevi, MongoDB è davvero così facile da imparare.
 
 Si dice spesso che la tecnologia avanza a velocità impressionante. E' vero che la lista di nuove tecnologie e tecniche da imparare è in continua crescita. Tuttavia sono convinto da tempo che le tecnologie fondamentali usate dai programmatori evolvono a un ritmo piuttosto ento. Una persona potrebbe passare anni senza imparare granché e tuttavia rimanere competente. Impressiona, piuttosto, la velocità con cui le tecnologie consolidate vengono rimpiazzate. Apparentemente da un giorno all'altro, tecnologie affermate sono messe in discussione da un repentino cambiamento di attenzione da parte dei programmatori.
 
@@ -52,7 +52,7 @@ Avrete notato che in questo libro useremo indifferentemente i termini MongoDB e 
 ## Cominciare ##
 Gran parte di questo libro è dedicata alle funzionalità di base di MongoDB. Per questo motivo ci affideremo alla shell di MongoDB. La shell è preziosa sia per imparare che come strumento di amministrazione, tuttavia il vostro codice applicativo farà uso senz'altro di uno dei driver MongoDB.
 
-Questo ci porta alla prima cosa da conoscere diMongoDB: i driver. Mongo è dotati di un [buon numero di driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers) per i principali linguaggi di programmazione. Possiamo pensare ai driver allo stesso modo di quelli per database relazionali che probabilmente abbiamo usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQ, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base piuttosto che con le librerie di più alto livello è libera. Ne faccio cenno perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza di driver ufficiali e di librerie della community - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework (spesso basandosi sui driver ufficiali -ndt).
+Questo ci porta alla prima cosa da conoscere diMongoDB: i driver. Mongo è dotati di un [buon numero di driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers) per i principali linguaggi di programmazione. Possiamo pensare ai driver allo stesso modo di quelli per database relazionali che probabilmente abbiamo usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQ, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base piuttosto che con le librerie di più alto livello è libera. Ne faccio cenno perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza di driver ufficiali e di librerie della community - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework.
 
 Nel corso della lettura del libro vi invito a giocare con MongoDB, sia mettendo in pratica quel che propongo che sperimentando in proprio, rispondendo alle domande che senz'altro sorgeranno spontanee. E' facile cominciare a lavorare con MongoDB, quindi diamoci subito da fare cominciando dalla configurazione di quel che ci serve.
 
@@ -62,7 +62,7 @@ Nel corso della lettura del libro vi invito a giocare con MongoDB, sia mettendo 
 
 3. Create un nuovo file di testo nella cartella `bin` e chiamatelo `mongodb.config`.
 
-4. Aggiungete questa riga al vostro mongodb.config: dbpath=PERCORSO_DOVE_VOLETE_SALVARE_IL_TUO_DATABASE`. Ad esempio, su Windows potreste scegliere `dbpath=c:\mongodb\data` mentre su Linux una scelta valida potrebbe essere `dbpath=/etc/mongodb/data`.
+4. Aggiungete questa riga al vostro mongodb.config: `dbpath=PERCORSO_DOVE_SALVARE_IL_DATABASE`. Ad esempio, su Windows potreste scegliere `dbpath=c:\mongodb\data` mentre su Linux una scelta valida potrebbe essere `dbpath=/etc/mongodb/data`.
 
 5. Assicuratevi che il `dbpath` che scelto esista.
 
