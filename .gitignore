@@ -2,3 +2,5 @@
 mongodb.pdf
 template/xetex.template
 template/xetex.log
+*.mobi
+*.epub

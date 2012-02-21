@@ -1,6 +1,6 @@
 \thispagestyle{empty}
 \changepage{}{}{}{-1.5cm}{}{2cm}{}{}{}
-![Il Piccolo Libro su MongoDB, di Karl Seguin](it/title.png)\ 
+![Il Piccolo Libro di MongoDB, di Karl Seguin](title.png)\ 
 
 \clearpage
 \changepage{}{}{}{1.5cm}{}{-2cm}{}{}{}
@@ -8,7 +8,7 @@
 ## Note sul Libro ##
 
 ### Licenza ###
-I contenuti del Piccolo Libro su MongoDB sono protetti da licenza Attribuzione - Non Commerciale 3.0. **Non dovresti aver pagato per questo libro**
+I contenuti del Piccolo Libro di MongoDB sono protetti da licenza Attribuzione - Non Commerciale 3.0. **Non dovresti aver pagato per questo libro**
 
 Sei libero di copiare, distribuire, modificare o mostrare il libro. Tuttavia ti chiedo di attribuire sempre l'opera all'autore, Karl Seguin, e di non usarla per scopi commerciali.
 

@@ -1,5 +1,5 @@
-en/mongodb.epub:	en/title.txt en/mongodb.markdown
+it/mongodb.epub:	it/title.txt it/mongodb.markdown
 	pandoc -o $@ $^
 
-en/mongodb.mobi:	en/mongodb.epub
+it/mongodb.mobi:	it/mongodb.epub
 	kindleGen $^

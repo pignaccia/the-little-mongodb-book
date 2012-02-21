@@ -55,7 +55,7 @@ $if(fancy-enums)$
 $endif$
 \setcounter{secnumdepth}{-1} 
 
-\usepackage[none]{hyphenat}
+%\usepackage[none]{hyphenat}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,%
