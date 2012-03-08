@@ -3,3 +3,4 @@ it/mongodb.epub:	it/title.txt it/mongodb.markdown
 
 it/mongodb.mobi:	it/mongodb.epub
 	kindleGen $^
+	
