@@ -1,23 +1,19 @@
 \documentclass{book}
+\usepackage[dvipsnames,usenames]{color}
 \usepackage{fullpage}
 \usepackage{changepage}
-\usepackage{graphicx}
-
-% \ifxetex
 \usepackage{fontspec,xltxtra,xunicode}
 \setmainfont{$mainfont$}
 \setsansfont{$sansfont$}
 \setmonofont{$monofont$}
 \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
-% \fi
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{12pt plus 2pt minus 1pt}
 \linespread{1.2}
 
-
 \usepackage{listings}
-\usepackage[dvipsnames,usenames]{color}
+%\PassOptionsToPackage{dvipsnames,usenames}{color}
 
 \definecolor{lightgray}{rgb}{.95,.95,.95}
 \definecolor{darkgray}{rgb}{.4,.4,.4}
@@ -55,7 +51,6 @@ $if(fancy-enums)$
 $endif$
 \setcounter{secnumdepth}{-1} 
 
-%\usepackage[none]{hyphenat}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks=true,%
