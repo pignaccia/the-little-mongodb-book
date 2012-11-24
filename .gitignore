@@ -1,5 +1,6 @@
 .DS_Store
-mongodb.pdf
-template/xetex.log
-*.mobi
+kindlegen/
+# Output books
+*.pdf
 *.epub
+*.mobi
