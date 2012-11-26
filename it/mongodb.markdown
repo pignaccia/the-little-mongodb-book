@@ -533,7 +533,7 @@ Reduce fosse chiamato con:
 	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}]
 	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 2}, {count: 1}]
 
-L'ouput finale è lo stesso (3) ma il percorso fatto è, semplicemente, diverso. Per questo motivo reduce deve esempre essere idempotente, il che significa che chiamare reduce più volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
+L'ouput finale è lo stesso (3) ma il percorso fatto è, semplicemente, diverso. Per questo motivo reduce deve sempre essere idempotente, il che significa che chiamare reduce più volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
 
 Non lo faremo qui, ma è frequente concatenare metodi reduce quando si eseguono analisi più complesse.
 
