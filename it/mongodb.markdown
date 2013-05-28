@@ -27,7 +27,7 @@ Le ultime versioni PDF, ePub e mobi sono invece reperibili qui:
 <http://nicolaiarocci.com/il-piccolo-libro-di-mongodb-edizione-italiana/>.
 
 ## Traduzione italiana ##
-Traduzione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca.
+Traduzione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca, David Gervasoni.
 
 Vi prego di segnalare ogni errore o imprecisione, così da migliorare nel tempo la qualità del testo.
 
@@ -239,7 +239,7 @@ Probabilmente vi aspettereste di trovare tutti i vostri preziosi unicorni vaccin
 	db.unicorns.find({vaccinated: true});
 
 ## Riepilogo ##
-Questo capitolo conclude la nostra introduzone alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update` scoprendo tre comportamenti interessanti. Primo, a differenza di una update SQL, la `update` in MongoDB sostituisce un documento. Per questo motivo il modificatore `$set` risulta piuttosto utile. Secondo, `update` supporta gli `upsert` (aggiornamento oppure inserimento) in modo piuttosto intuitivo, ciò che lo rende particolarmente utile quando viene abbinato al modificatore `$inc`. Infine, per default `update` aggiorna solo il primo documento trovato.
+Questo capitolo conclude la nostra introduzione alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update` scoprendo tre comportamenti interessanti. Primo, a differenza di una update SQL, la `update` in MongoDB sostituisce un documento. Per questo motivo il modificatore `$set` risulta piuttosto utile. Secondo, `update` supporta gli `upsert` (aggiornamento oppure inserimento) in modo piuttosto intuitivo, ciò che lo rende particolarmente utile quando viene abbinato al modificatore `$inc`. Infine, per default `update` aggiorna solo il primo documento trovato.
 
 Tenete sempre presente che stiamo usando MongoDB dal punto di vista della sua shell. Il driver e la libreria adottata potrebbero alterare questi comportamenti predefiniti, o esporre una API differente. Il driver Ruby, per esempio, unisce gli ultimi due parametri in una singola hash: `{:upsert => false, :multi => false}`.
 
