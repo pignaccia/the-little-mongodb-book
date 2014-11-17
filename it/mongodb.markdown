@@ -27,7 +27,7 @@ Le ultime versioni PDF, ePub e mobi sono invece reperibili qui:
 <http://nicolaiarocci.com/il-piccolo-libro-di-mongodb-edizione-italiana/>.
 
 ## Traduzione italiana ##
-Traduzione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca, David Gervasoni.
+Traduzione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca, David Gervasoni, Emiliano Bovetti.
 
 Vi prego di segnalare ogni errore o imprecisione, così da migliorare nel tempo la qualità del testo.
 
