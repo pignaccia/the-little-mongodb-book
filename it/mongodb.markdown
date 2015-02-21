@@ -10,7 +10,7 @@ Puoi consultare il testo integrale della licenza a questo indirizzo:
 <http://creativecommons.org/licenses/by-nc/3.0/legalcode>
 
 ## Informazioni sull'Autore ##
-Karl Seguin è uno sviluppatore competente in diversi campi e tecnologie. È esperto programmatore .NET e Ruby. Collabora saltuariamente a progetti OSS, è scrittore tecnico e, occasionalmente, speaker. Per quanto riguarda MongoDB è stato tra i principali autori della libreria C# per MongoDB, NoRM. Ha scritto il tutorial interattivo [moongly](http://mongly.com) nonché [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). Il suo servizio per sviluppatori di casual games, [mogade](http://mogade.com/) gira con MongoDB.
+Karl Seguin è uno sviluppatore competente in diversi campi e tecnologie. È esperto programmatore .NET e Ruby. Collabora saltuariamente a progetti OSS, è scrittore tecnico e, occasionalmente, speaker. Per quanto riguarda MongoDB è stato tra i principali autori della libreria C# per MongoDB, NoRM. Ha scritto il tutorial interattivo [mongly](http://openmin.net/mongly/) nonché [Mongo Web Admin](https://github.com/karlseguin/Mongo-Web-Admin). Il suo servizio per sviluppatori di casual games, [mogade](http://mogade.com/) gira su MongoDB.
 
 Il suo blog è <http://openmymind.net>, e twitta come [@karlseguin](http://twitter.com/karlseguin)
 
@@ -18,7 +18,7 @@ Il suo blog è <http://openmymind.net>, e twitta come [@karlseguin](http://twitt
 Un grazie speciale a [Perry Neal](http://twitter.com/perryneal) per avermi prestato occhi, mente e passione. Mi hai dato un aiuto prezioso. Grazie.
 
 ## Ultima Versione ##
-L'ultima versione del sorgente di questo libro è disponibile qui:
+Questa versione è aggiornata a MongoDB 2.6 da Asya Kamsky. L'ultima versione del sorgente di questo libro è disponibile qui:
 
 <http://github.com/nicolaiarocci/the-little-mongodb-book>.
 
@@ -42,14 +42,14 @@ Anche se sembra che queste transizioni avvengano nel corso di una notte, la real
 
 Detto questo, prima di tutto dobbiamo capirci su cosa si intenda per NoSQL. È un termine vago, che ha significati diversi a seconda di chi lo usa. Personalmente lo intendo in senso molto ampio, per far riferimento a un sistema che svolge un ruolo nel salvataggio dei dati. In altre parole per me NoSQL è la convinzione che lo strato di persistenza non è necessariamente responsabilità di un solo sistema. Laddove storicamente i fornitori di database relazionali hanno sempre tentanto di posizionare i loro software come soluzione universale per qualunque problema, NoSQL tende a individuare piccole unità di responsabilità per ognuna delle quali scegliere lo strumento ideale. Quindi uno stack NoSQL potrebbe contemplare un database relazionale, MySQL per esempio, Redis per ricerche veloci e Hadoop per le elaborazioni dati intensive. In parole povere NoSQL è essere aperti e coscienti dell'esistenza di modelli e strumenti alternativi per la gestione dei dati. 
 
-Vi potreste domandare qual è il ruolo ricoperto da MongoDB in tutto questo. In quanto database orientato ai documenti Mongo è una soluzione NoSQL piuttosto generalizzata, e in effetti andrebbe visto come una alternativa ai database relazionali. Come i database relazionali anche Mongo potrebbe trarre beneficio dall'abbinamento a soluzioni NoSQL più specializzate. MongoDB ha vantaggi e svantaggi che vedremo nei prossimi capitoli di questo libro.
+Vi potreste domandare qual è il ruolo ricoperto da MongoDB in tutto questo. In quanto database orientato ai documenti MongoDB è una soluzione NoSQL piuttosto generalizzata, e in effetti andrebbe visto come una alternativa ai database relazionali. Come i database relazionali anche Mongo potrebbe trarre beneficio dall'abbinamento a soluzioni NoSQL più specializzate. MongoDB ha vantaggi e svantaggi che vedremo nei prossimi capitoli di questo libro.
 
 Avrete notato che in questo libro useremo indifferentemente i termini MongoDB e Mongo.
 
 # Cominciare #
 Gran parte di questo libro è dedicata alle funzionalità di base di MongoDB. Per questo motivo ci affideremo alla shell di MongoDB. La shell è preziosa sia per imparare che come strumento di amministrazione, tuttavia il vostro codice applicativo farà uso senz'altro di uno dei driver MongoDB.
 
-Questo ci porta alla prima cosa da conoscere di MongoDB: i driver. Mongo è dotato di un [buon numero di driver ufficiali](http://www.mongodb.org/display/DOCS/Drivers) per i principali linguaggi di programmazione. Possiamo pensare ai driver allo stesso modo di quelli per database relazionali che probabilmente abbiamo usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQ, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base piuttosto che con le librerie di più alto livello è libera. Ne faccio cenno perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza di driver ufficiali e di librerie della community - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework.
+Questo ci porta alla prima cosa da conoscere di MongoDB: i driver. Mongo è dotato di un [buon numero di driver ufficiali](http://www.mongodb.org/ecosystem/drivers/) per i principali linguaggi di programmazione. Possiamo pensare ai driver allo stesso modo di quelli per database relazionali che probabilmente abbiamo usato in passato. La community di sviluppatori ha poi costruito, sulla base di questi driver, una serie di framework e librerie dedicate ai vari linguaggi. Per esempio [NoRM](https://github.com/atheken/NoRM) è una libreria C# che implementa LINQ, mentre [MongoMapper](https://github.com/jnunemaker/mongomapper) è una libreria Ruby compatibile con ActiveRecord. La scelta di programmare coi driver di base piuttosto che con le librerie di più alto livello è libera. Ne faccio cenno perché molte persone che si avvicinano a MongoDB rimangono confuse dall'esistenza di driver ufficiali e di librerie della community - in linea generale i primi si occupano di comunicazione e connettività di base con MongoDB, mentre le seconde implementano caratteristiche specifiche dei linguaggi/framework.
 
 Nel corso della lettura del libro vi invito a giocare con MongoDB, sia mettendo in pratica quel che propongo che sperimentando in proprio, rispondendo alle domande che senz'altro sorgeranno spontanee. È facile cominciare a lavorare con MongoDB, quindi diamoci subito da fare cominciando dalla configurazione di quel che ci serve.
 
@@ -86,9 +86,9 @@ Per cominciare, ci sono sei semplici concetti che dobbiamo comprendere.
 
 4. Un documento è a sua volta composto da uno o più 'campi', che come potete immaginare assomigliano alle 'colonne'.
 
-5. Gli 'indici' in MongoDB funzionano in modo molto simile alle loro controparti RDBMS.
+5. Gli 'indici' in MongoDB funzionano in gran parte come le loro controparti RDBMS.
 
-6. I 'cursori', a cui spesso viene data poca importanza, sono qualcosa di diverso dagli altri cinque concetti, e li ritengo abbastanza importanti da meritare attenzione. È importante sapere che quando si chiedono dati a MongoDB questi restituisce un cursore col quale possiamo, per esempio, contare i documenti o spostarci avanti, senza che alcun dato venga effettivamente letto.
+6. I 'cursori', a cui spesso viene data poca importanza, sono qualcosa di diverso dagli altri cinque concetti, e li ritengo abbastanza importanti da meritare attenzione. È importante sapere che quando si chiedono dati a MongoDB questi restituisce puntantore al set di risultati chiamato cursore, col quale possiamo già compiere operazioni come contare i documenti o spostarci in avanti, prima ancora di scaricare i dati.
 
 Riassumendo, MongoDB è fatto di `database` che contengono `collezioni`. Una `collezione` è una raccolta di `documenti`. Ogni `documento` è composto da `campi`. Le `collezioni` possono essere `indicizzate`, il che migliora le prestazioni di ricerche e ordinamenti. Infine, quando chiediamo dati a MongoDB otteniamo un `cursore`, la cui esecuzione è rinviata finché non si renderà necessaria.
 
@@ -102,17 +102,18 @@ Provate a digitare `db.help()`. Otterrete una lista dei comandi che è possibile
 
 Piccola nota a margine. Poiché questa è una shell JavaScript, se eseguite un metodo e omettete le parentesi `()` vedrete il contenuto del metodo piuttosto che ottenerne l'esecuzione. Ve lo ricordo affinché non rimaniate sorpresi la prima volta che vi capiterà di vedere una risposta che comincia con `function (...){`. Per esempio, se digitate `db.help` (senza le parentesi) quello che otterrete è la visualizzazione dell'implementazione interna del metodo `help`.
 
-Prima di tutto useremo il metodo globale `use` per cambiare il database attivo. Digitate `use learn`. Non importa che il database non esista ancora. Quando creeremo la prima collezione, allora verrà creato anche il database `learn`. Ora che abbiamo un database attivo possiamo eseguire comandi sul database stesso, come per esempio `db.getCollectionNames()`. Se lo fate ora dovreste ottenere un array vuoto (`[ ]`). Poiché le collezioni sono schema-less non c'è necessità di crearle esplicitamente. Possiamo semplicemente inserire un documento nella nuova collezione. Per farlo usiamo il comando `insert`, passandogli direttamente il documento da inserire:
+Prima di tutto useremo l'helper globale `use` per cambiare il database attivo. Digitate `use learn`. Non importa che il database non esista ancora. Quando creeremo la prima collezione, allora verrà creato anche il database `learn`. Ora che abbiamo un database attivo possiamo eseguire comandi sul database stesso, come per esempio `db.getCollectionNames()`. Se lo fate ora dovreste ottenere un array vuoto (`[ ]`). Poiché le collezioni sono schema-less non c'è necessità di crearle esplicitamente. Possiamo semplicemente inserire un documento nella nuova collezione. Per farlo usiamo il comando `insert`, passandogli direttamente il documento da inserire:
 
-	db.unicorns.insert({name: 'Aurora', gender: 'f', weight: 450})
+	db.unicorns.insert({name: 'Aurora', gender: 
+	        'f', weight: 450})
 
-La riga esegue il comando `insert` nei confronti della collezione `unicorns`, passando un singolo argomento. Per la serializzazione MongoDB usa internamente il formato JSON binario. Esternamente ciò significa che useremo parecchio JSON, come nel caso dei nostri parametri. Se ora eseguiamo `db.getCollectionNames()` otteniamo due collezioni: `unicorns` e `system.indexes`. `system.indexes` viene creata una volta per database, e contiene informazioni sugli indici del database.
+La riga esegue il comando `insert` nei confronti della collezione `unicorns`, passando un singolo parametro. Per la serializzazione MongoDB usa internamente una versione binaria del formato JSON chiamato BSON. Esternamente ciò significa che useremo parecchio JSON, come nel caso dei nostri parametri. Se ora eseguiamo `db.getCollectionNames()` otteniamo due collezioni: `unicorns` e `system.indexes`. `system.indexes` viene creata una volta per database, e contiene informazioni sugli indici del database.
 
 Ora possiamo usare il comando `find` sulla collezione `unicorns` per ottenere una lista di documenti:
 
 	db.unicorns.find()
 
-Notate che in aggiunta ai dati che avete indicato c'è un campo `_id`. Ogni documento deve avere un campo `_id` univoco. Potete generarlo da voi oppure lasciare che sia MongoDB a generare un ObjectId per voi. Probabilmente la maggior parte delle volte sarà sufficiente lasciarlo generare a MongoDB. Per impostazione predefinita il campo `_id` è indicizzato - il che spiega l'esistenza della collezione `system.indexes`. È possibile consultare l'elenco degli indici:
+Notate che in aggiunta ai dati che avete indicato c'è un campo `_id`. Ogni documento deve avere un campo `_id` univoco. Potete generarlo da voi oppure lasciare che sia MongoDB a generare un valore per voi, che sarà di tipo `ObjectId`. Probabilmente la maggior parte delle volte sarà sufficiente lasciarlo generare a MongoDB. Per impostazione predefinita il campo `_id` è indicizzato - il che spiega l'esistenza della collezione `system.indexes`. È possibile consultare l'elenco degli indici:
 
 	db.system.indexes.find()
 
@@ -125,71 +126,146 @@ Torniamo alla nostra discussione sulle collezioni schema-less. Inseriamo un docu
 Usiamo di nuovo `find` per vedere la lista dei documenti. Quando conosceremo qualcosa in più discuteremo questo interessante comportamento di MongoDB, ma giunti a questo punto dovreste cominciare a comprendere perché la terminologia tradizionale non è la più adeguata.
 
 ## Padroneggiare i Selettori ##
-Oltre ai sei concetti già visti c'è un aspetto pratico di MongoDB che è necessario comprendere a fondo prima di procedere con argomenti più avanzati: i selettori di query (query selectors). Un selettore di query in MongoDB assomiglia alla clausola `where` di un comando SQL. In quanto tale viene usato per trovare, contare, aggiornare e rimuovere documenti dalle collezioni. Un selettore è un oggetto JSON la cui forma più semplice è `{}`, che rintraccia tutti i documenti (`null` è altrettando valido). Se volessimo trovare tutti gli unicorni femmina potremmo usare `{gender:'f'}`.
+Oltre ai sei concetti già visti c'è un aspetto pratico di MongoDB che è necessario comprendere a fondo prima di procedere con argomenti più avanzati: i selettori di query (query selectors). Un selettore di query in MongoDB assomiglia alla clausola `where` di un comando SQL. In quanto tale viene usato per trovare, contare, aggiornare e rimuovere documenti dalle collezioni. Un selettore è un oggetto JSON la cui forma più semplice è `{}`, che rintraccia tutti i documenti. Se volessimo trovare tutti gli unicorni femmina potremmo usare `{gender:'f'}`.
 
 Prima di addentrarci a fondo nei selettori prepariamo un po' di dati con cui giocare. Prima di tutto cancelliamo ciò che abbiamo inserito finora nella collezione `unicorns`: `db.unicorns.remove()` (poiché forniamo un selettore, rimuoveremo tutti i documenti). Ora digitiamo i comandi di inserimento che seguono, così da ottenere un po' di dati con cui lavorare (vi suggerisco di copiarli e incollarli da qui):
 
-	db.unicorns.insert({name: 'Horny', dob: new Date(1992,2,13,7,47), loves: ['carrot','papaya'], weight: 600, gender: 'm', vampires: 63});
-	db.unicorns.insert({name: 'Aurora', dob: new Date(1991, 0, 24, 13, 0), loves: ['carrot', 'grape'], weight: 450, gender: 'f', vampires: 43});
-	db.unicorns.insert({name: 'Unicrom', dob: new Date(1973, 1, 9, 22, 10), loves: ['energon', 'redbull'], weight: 984, gender: 'm', vampires: 182});
-	db.unicorns.insert({name: 'Roooooodles', dob: new Date(1979, 7, 18, 18, 44), loves: ['apple'], weight: 575, gender: 'm', vampires: 99});
-	db.unicorns.insert({name: 'Solnara', dob: new Date(1985, 6, 4, 2, 1), loves:['apple', 'carrot', 'chocolate'], weight:550, gender:'f', vampires:80});
-	db.unicorns.insert({name: 'Ayna', dob: new Date(1998, 2, 7, 8, 30), loves: ['strawberry', 'lemon'], weight: 733, gender: 'f', vampires: 40});
-	db.unicorns.insert({name: 'Kenny', dob: new Date(1997, 6, 1, 10, 42), loves: ['grape', 'lemon'], weight: 690,  gender: 'm', vampires: 39});
-	db.unicorns.insert({name: 'Raleigh', dob: new Date(2005, 4, 3, 0, 57), loves: ['apple', 'sugar'], weight: 421, gender: 'm', vampires: 2});
-	db.unicorns.insert({name: 'Leia', dob: new Date(2001, 9, 8, 14, 53), loves: ['apple', 'watermelon'], weight: 601, gender: 'f', vampires: 33});
-	db.unicorns.insert({name: 'Pilot', dob: new Date(1997, 2, 1, 5, 3), loves: ['apple', 'watermelon'], weight: 650, gender: 'm', vampires: 54});
-	db.unicorns.insert({name: 'Nimue', dob: new Date(1999, 11, 20, 16, 15), loves: ['grape', 'carrot'], weight: 540, gender: 'f'});
-	db.unicorns.insert({name: 'Dunx', dob: new Date(1976, 6, 18, 18, 18), loves: ['grape', 'watermelon'], weight: 704, gender: 'm', vampires: 165});
+	db.unicorns.insert({name: 'Horny', 
+	        dob: new Date(1992,2,13,7,47), 
+	        loves: ['carrot','papaya'], weight: 600, 
+	        gender: 'm', vampires: 63});
+	db.unicorns.insert({name: 'Aurora', 
+	        dob: new Date(1991, 0, 24, 13, 0), 
+	        loves: ['carrot', 'grape'], weight: 450, 
+	        gender: 'f', 
+	        vampires: 43});
+	db.unicorns.insert({name: 'Unicrom', 
+	        dob: new Date(1973, 1, 9, 22, 10), 
+	        loves: ['energon', 'redbull'], 
+	        weight: 984, 
+	        gender: 'm', 
+	        vampires: 182});
+	db.unicorns.insert({name: 'Roooooodles', 
+	        dob: new Date(1979, 7, 18, 18, 44), 
+	        loves: ['apple'], 
+	        weight: 575, 
+	        gender: 'm', 
+	        vampires: 99});
+	db.unicorns.insert({name: 'Solnara', 
+	    dob: new Date(1985, 6, 4, 2, 1), 
+	    loves:['apple', 'carrot', 'chocolate'], 
+	    weight:550, 
+	    gender:'f', 
+	    vampires:80});
+	db.unicorns.insert({name: 'Ayna', 
+	        dob: new Date(1998, 2, 7, 8, 30), 
+	        loves: ['strawberry', 'lemon'], 
+	        weight: 733, 
+	        gender: 'f', 
+	        vampires: 40});
+	db.unicorns.insert({name: 'Kenny', 
+	        dob: new Date(1997, 6, 1, 10, 42), 
+	        loves: ['grape', 'lemon'], 
+	        weight: 690,  
+	        gender: 'm', 
+	        vampires: 39});
+	db.unicorns.insert({name: 'Raleigh', 
+	        dob: new Date(2005, 4, 3, 0, 57), 
+	        loves: ['apple', 'sugar'], 
+	        weight: 421, 
+	        gender: 'm', 
+	        vampires: 2});
+	db.unicorns.insert({name: 'Leia', 
+	        dob: new Date(2001, 9, 8, 14, 53), 
+	        loves: ['apple', 'watermelon'], 
+	        weight: 601, 
+	        gender: 'f', 
+	        vampires: 33});
+	db.unicorns.insert({name: 'Pilot', 
+	        dob: new Date(1997, 2, 1, 5, 3), 
+	        loves: ['apple', 'watermelon'], 
+	        weight: 650, 
+	        gender: 'm', 
+	        vampires: 54});
+	db.unicorns.insert({name: 'Nimue', 
+	        dob: new Date(1999, 11, 20, 16, 15), 
+	        loves: ['grape', 'carrot'], 
+	        weight: 540, 
+	        gender: 'f'});
+	db.unicorns.insert({name: 'Dunx', 
+	        dob: new Date(1976, 6, 18, 18, 18), 
+	        loves: ['grape', 'watermelon'], 
+	        weight: 704, 
+	        gender: 'm', 
+	        vampires: 165});
 
 Ora che abbiamo i dati possiamo fare pratica coi selettori. Usiamo `{campo: valore}` per trovare documenti il cui `campo` sia uguale a `valore`. Usiamo `{campo1: valore1, campo2: valore2}` per indicare l'operatore `and`. Usiamo gli operatori `$lt`, `$lte`, `$gt`, `$gte` e `$ne` rispettivamente per minore di (less than), minore o uguale (less than or equal), maggiore di (greater than), maggiore o uguale (greater then or equal) e diverso da (not equal). Per esempio, per ottenere tutti gli unicorni maschi che pesano più di 700 libbre possiamo usare:
 
-	db.unicorns.find({gender: 'm', weight: {$gt: 700}})
-	//oppure (non è la scelta migliore, ma vale come esempio)
-	db.unicorns.find({gender: {$ne: 'f'}, weight: {$gte: 701}})
+	db.unicorns.find({gender: 'm', 
+	        weight: {$gt: 700}})
+	//oppure (non è la scelta migliore, 
+	//ma vale come esempio)
+	db.unicorns.find({gender: {$ne: 'f'}, 
+            weight: {$gte: 701}})
 
 L'operatore `$exists` va usato per verificare la presenza o l'assenza di un campo, per esempio:
 
-	db.unicorns.find({vampires: {$exists: false}})
+	db.unicorns.find({
+	        vampires: {$exists: false}})
 
-Dovrebbe restituire un singolo documento. Se vogliamo un OR invece di un AND usiamo l'operatore `$or` assegnandoli un array di valori sui quali vogliamo compiere l'OR:
+dovrebbe restituire un singolo documento. L'operatore `$in` viene usato per cercare uno dei valori che vengono passati in un array, per esempio:
 
-	db.unicorns.find({gender: 'f', $or: [{loves: 'apple'}, {loves: 'orange'}, {weight: {$lt: 500}}]})
+	db.unicorns.find({
+	        loves: {$in:['apple','orange']}})
 
-Questa istruzione restituisce tutti gli unicorni femmina che amano le mele (apple), le arance (orange) oppure che pesano (weight) meno di 500 libbre.
+restituisce qualunque unicorno che ami (love) mele (apple) o arance (orange).
 
-Nell'ultimo esempio succede qualcosa di interessante. Forse avrete notato che il campo `loves` è un array. MongoDB supporta gli array come oggetti di prima classe. Questa è una caratteristica incredibilmente utile. Una volta cominciato ad usarla ti domanderai come hai potuto vivere senza finora. Ciò che è ancor più interessante è quanto sia facile fare selezioni basate su un valore array: `{loves: 'watermelon'}` restituisce qualunque documento che abbia campi 'loves' valorizzati a 'watermelon'.
+Se vogliamo un OR piuttosto che un AND tra diverse condizioni su campi diversi, allora usiamo l'operatore `$or` assegnandoli un array di selettori che vogliamo esclusivi:
 
-Sono disponibili più operatori di quelli che abbiamo visto finora. Il più flessibile è `$where`, il quale ci permette di passare codice JavaScript da eseguire sul server. Questi operatori sono discussi nella sezione [Advanced Queries](http://www.mongodb.org/display/DOCS/Advanced+Queries#AdvancedQueries) del sito di MongoDB. Quel che abbiamo visto fin qui è sufficiente per cominciare con MongoDB, ed è anche ciò che userete per la maggior parte del tempo.
+    db.unicorns.find({gender: 'f',}
+            $or: [{loves: 'apple'},
+                {weight: {$lt: 500}}])
+
+L'istruzione precedente restituirà tutti gli unicorni femmina che amano mangiare pere oppure pesano meno di 500.
+
+Nell'ultimo esempio succede qualcosa di interessante. Forse avrete notato che il campo `loves` è un array. MongoDB supporta gli array come oggetti di prima classe. Questa è una caratteristica incredibilmente utile. Una volta cominciato ad usarla ti domanderai come hai potuto vivere senza finora. Ciò che è ancor più interessante è quanto sia facile fare selezioni basate su valori di array: `{loves: 'watermelon'}` restituisce qualunque documento che abbia campi 'loves' valorizzati a 'watermelon'.
+
+Sono disponibili più operatori di quelli che abbiamo visto finora. Questi operatori sono discussi nella sezione [Query Selectors](http://www.mongodb.org/manual/reference/operator/query/#query-selectors) del manuale di MongoDB. Quel che abbiamo visto fin qui è sufficiente per cominciare con MongoDB, ed è anche ciò che userete per la maggior parte del tempo.
 
 Abbiamo visto come i selettori possano essere usati in abbinamento al comando `find`. Possono essere adoperati anche con `remove`, già incontrato brevemente, `count`, che ancora non abbiamo visto ma il cui significato potete intuire da soli, e col comando `update` a cui ci dedicheremo in seguito.
 
 Il `ObjectId` che MongoDB ha generato per il nostro campo `_id` può a sua volta essere selezionato:
 
-	db.unicorns.find({_id: ObjectId("L'ObjectId")})
+	db.unicorns.find(
+	        {_id: ObjectId("ValoreObjectId")})
 
 ## Riepilogo ##
-Non abbiamo ancora conosciuto il comando `update` né abbiamo visto le cose più interessanti che possiamo ottenere con `find`. Tuttavia abbiamo fatto partire MongoDB, abbiamo dato una occhiata ai comandi `insert` e `remove` (su questi non c'è molto altro da aggiungere). Abbiamo introdotto `find` e scoperto che cosa sono i 'selettori' in MongoDB. Siamo partiti col piede giusto, impostando le basi per quel che deve ancora venire. Che ci crediate o no, a questo punto conoscete la maggior parte di quel che serve sapere per lavorare con MongoDB - è progettato davvero per essere facile e veloce da imparare e usare. Vi invito caldamente a giocare con la vostra copia locale prima di proseguire. Inserite documenti diversi, possibilmente in nuove collezioni, e prendete confidenza con i diversi selettori. Usate `find`, `count` e `remove`. Dopo pochi tentativi ciò che ora può sembrare poco chiaro finirà probabilmente per avere senso.
+Non abbiamo ancora conosciuto il comando `update` né abbiamo visto le cose più interessanti che possiamo ottenere con `find`. Tuttavia abbiamo fatto partire MongoDB, abbiamo dato una occhiata ai comandi `insert` e `remove` (su questi non c'è molto altro da aggiungere). Abbiamo introdotto `find` e scoperto che cosa sono i 'selettori' in MongoDB. Siamo partiti col piede giusto, impostando le basi per quel che deve ancora venire. Che ci crediate o no, a questo punto conoscete la maggior parte di quel che occorre sapere per cominciare a lavorare con MongoDB - è progettato davvero per essere facile e veloce da imparare e usare. Vi invito caldamente a giocare con la vostra copia locale prima di proseguire. Inserite documenti diversi, possibilmente in nuove collezioni, e prendete confidenza con i diversi selettori. Usate `find`, `count` e `remove`. Dopo pochi tentativi ciò che ora può sembrare poco chiaro finirà probabilmente per avere senso.
 
 # Capitolo 2 - Gli Aggiornamenti #
 Nel primo capitolo abbiamo introdotto tre delle quattro operazioni CRUD (create, read, update, delete). Questo capitolo è dedicato all'operazione di cui non abbiamo ancora parlato: `update`. Quest'ultima riserva qualche sorpresa e, per questo motivo, le dedichiamo un intero capitolo.
 
 ## Update: Replace vs $set ##
-Nella sua forma più semplice `update` richiede due argomenti: il selettore da usare (where) e il valore del campo da aggiornare. Se Roooooodles avesse guadagnato qualche chilo, potremmo fare:
+Nella sua forma più semplice `update` richiede due parametri: il selettore da usare (where) e ciò che serve per aggiornare i campi. Se Roooooodles avesse preso qualche chilo, vi apettereste di dover eseguire:
 
 	db.unicorns.update({name: 'Roooooodles'}, {weight: 590})
 
 (se nel frattempo avete cambiato la collezione `unicorns` e i dati originali sono compromessi, procedete con un `remove` di tutti i documenti quindi re-inserite i dati col codice visto nel capitolo 1).
 
-Se questo fosse codice reale aggiorneremmo i dati in base al campo `_id`, ma poiché non possiamo sapere a priori quale `_id` verrà generato da MongoDB, continueremo a usare `name`. Ora, se andiamo a cercare il record che abbiamo aggiornato:
+Ora, se andiamo a cercare il record che abbiamo aggiornato:
 
 	db.unicorns.find({name: 'Roooooodles'})
 
-Abbiamo la prima sopresa che `update` ci riserva. Non viene trovato alcun documento perchè il secondo parametro che forniamo viene usato per **sostituire** l'originale. In altre parole la nostra `update` ha cercato il documento per `name`, quindi ha sostituito l'intero documento con il nuovo documento (il secondo parametro). Questo è molto diverso dal funzionamento del comando `update` nel mondo SQL. In alcune situazioni questo comportamento è molto comodo, e può essere sfruttato per ottenere aggiornamenti davvero dinamici. Tuttavia, quando tutto quel che vogliamo è cambiare il valore di uno o più campi è meglio usare il modificatore `$set` di MongoDB:
+Abbiamo la prima sopresa che `update` ci riserva. Non viene trovato alcun documento poiché il secondo parametro fornito non conteneva alcun operatore di aggiornamento, di conseguenza è stata eseguita una **sostituzione** dell'originale. In altre parole la nostra `update` ha cercato il documento per `name`, quindi ha sostituito l'intero documento con il nuovo documento (il secondo parametro). Una funzionalità equivalente non esiste per il comando `update` SQL. In alcune situazioni questo comportamento è molto comodo, e può essere sfruttato per ottenere aggiornamenti davvero dinamici. Tuttavia, quando in MongoDB vogliamo cambiare il valore di uno o più campi è necessario usare l'operatore di aggiornamento `$set`. Usate questo comando per ripristinare i campi cancellati:
 
-	db.unicorns.update({weight: 590}, {$set: {name: 'Roooooodles', dob: new Date(1979, 7, 18, 18, 44), loves: ['apple'], gender: 'm', vampires: 99}})
+	db.unicorns.update({weight: 590}, {$set: {
+	        name: 'Roooooodles', 
+	        dob: new Date(1979, 7, 18, 18, 44), 
+	        loves: ['apple'], 
+	        gender: 'm', 
+	        vampires: 99}})
 
-Questo ripristinerà i campi perduti. Non sovrascriverà il nuovo `weight` dato che non l'abbiamo indicato nel secondo argomento. Ora se eseguiamo:
+Tutto questo non sovrascriverà il nuovo `weight` dato che non l'abbiamo indicato nel secondo argomento del comando originale. Ora se eseguiamo:
 
 	db.unicorns.find({name: 'Roooooodles'})
 
@@ -197,49 +273,56 @@ Otteniamo il risultato che volevamo. Quindi il modo corretto di aggiornare il pe
 
 	db.unicorns.update({name: 'Roooooodles'}, {$set: {weight: 590}})
 
-## Modificatori di Aggiornamento ##
-Oltre a `$set` possiamo azionare altri modificatori che ci consentono di fare cose eleganti. Tutti questi modificatori di aggiornamento agiscono sui campi - non azzerano l'intero documento. Per esempio il modificatore `$inc` consente di aumentare o diminuire il valore di un campo. Supponiamo che a Pilot siano state assegnate un paio di uccisioni di vampiri di troppo; potremmo correggere l'errore eseguendo:
+## Operatori di Aggiornamento ##
+Oltre a `$set` possiamo usare altri operatori di aggiornamento che ci permettono di fare cose carine. Tutti questi operatori di aggiornamento agiscono sui campi - non azzerano l'intero documento. Per esempio l'operatore `$inc` consente di aumentare o diminuire il valore di un campo. Se  Pilot sono state assegnate un paio di uccisioni di vampiri di troppo, possiamo correggere l'errore con:
 
-	db.unicorns.update({name: 'Pilot'}, {$inc: {vampires: -2}})
+	db.unicorns.update({name: 'Pilot'}, 
+	        {$inc: {vampires: -2}})
 
-Se Aurora sviluppasse improvvisamente una passione per i dolci, potremmo aggiungerli al suo array `loves` con il modificatore `$push`:
+Se Aurora sviluppasse improvvisamente una passione per i dolci, potremmo aggiungerli al suo array `loves` grazie  all'operatore `$push`:
 
-	db.unicorns.update({name: 'Aurora'}, {$push: {loves: 'sugar'}})
+	db.unicorns.update({name: 'Aurora'}, 
+	        {$push: {loves: 'sugar'}})
 
-La sezione [Updating](http://www.mongodb.org/display/DOCS/Updating) del sito di MongoDB ha informazioni sugli altri modificatori di aggiornamento disponibili.
+La sezione [Update Operators](http://www.mongodb.org/manual/reference/operator/update/#update-operators)) del manuale di MongoDB ha informazioni sugli altri operatori di aggiornamento disponibili.
 
 ## Upserts ##
-Una delle sorprese più piacevoli che `update` ci riserva è senz'altro il supporto per gli `upsert`. Se `upsert` trova il documento cercato lo aggiorna, altrimenti lo crea. Gli upsert sono utili in diverse situazioni, ve ne renderete conto non appena vi ci imbatterete. Per attivare gli upsert impostiamo un terzo parametro a `true`.
+Una delle sorprese più piacevoli che `update` ci riserva è senz'altro il supporto per gli `upsert`. Se `upsert` trova il documento cercato lo aggiorna, altrimenti lo crea. Gli upsert sono utili in diverse situazioni, ve ne renderete conto non appena vi ci imbatterete. Per attivare l'upsert passiamo un terzo parametro di aggiornamento:  `{upsert:true}`.
 
-Un esempio banale è quello di contatore di visite ad un sito web. Se volessimo gestire un contatore in tempo reale dovremmo verificare l'esistenza del record per la pagina attuale, quindi decidere per l'inserimento o l'aggiornamento. Poiché omettiamo il terzo parametro (oppure se lo impostiamo a false) l'esecuzione del comando seguente non ottiene risultati:
+Un esempio banale è quello di contatore di visite ad un sito web. Se volessimo gestire un contatore in tempo reale dovremmo verificare l'esistenza del record per la pagina attuale, quindi decidere per l'inserimento o l'aggiornamento. Poiché omettiamo l'opzione upsert (oppure se la impostiamo a false) l'esecuzione del comando seguente non ottiene risultati:
 
-	db.hits.update({page: 'unicorns'}, {$inc: {hits: 1}});
+	db.hits.update({page: 'unicorns'}, 
+	        {$inc: {hits: 1}});
 	db.hits.find();
 
-Tuttavia attivando gli upsert il risultato cambia:
+Tuttavia attivando l'opzione upsert il risultato cambia:
 
-	db.hits.update({page: 'unicorns'}, {$inc: {hits: 1}}, true);
+	db.hits.update({page: 'unicorns'}, 
+	        {$inc: {hits: 1}}, {upsert:true});
 	db.hits.find();
 
 Poiché non esistono documenti col campo `page` equivalente a `unicorns`, viene inserito un nuovo documento. Se eseguiamo lo stesso comando una seconda volta, il documento esistente viene aggiornato, e il suo campo `hits` aumentato a due.
 
-	db.hits.update({page: 'unicorns'}, {$inc: {hits: 1}}, true);
+	db.hits.update({page: 'unicorns'}, 
+	        {$inc: {hits: 1}}, {upset:true});
 	db.hits.find();
 
 ## Aggiornamenti Multipli ##
 L'ultima sorpresa che `update` ci riserva è il fatto che, per default, aggiorna un solo documento. Stando agli esempi visti finora questo comportamente sembrebbe logico. Tuttavia se eseguiste qualcosa di questo genere:
 
-	db.unicorns.update({}, {$set: {vaccinated: true }});
+	db.unicorns.update({}, 
+	        {$set: {vaccinated: true }});
 	db.unicorns.find({vaccinated: true});
 
 
-Probabilmente vi aspettereste di trovare tutti i vostri preziosi unicorni vaccinati. Per ottenere il comportamento desiderato è necessario mettere a true un quarto parametro:
+Vi potreste aspettare di trovare tutti i vostri preziosi unicorni vaccinati. Per ottenere il comportamento desiderato è necessario imporstare a true l'opzione `multi`:
  
-	db.unicorns.update({}, {$set: {vaccinated: true }}, false, true);
+	db.unicorns.update({}, {$set: {vaccinated: true }}, 
+            {multi:true});
 	db.unicorns.find({vaccinated: true});
 
 ## Riepilogo ##
-Questo capitolo conclude la nostra introduzione alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update` scoprendo tre comportamenti interessanti. Primo, a differenza di una update SQL, la `update` in MongoDB sostituisce un documento. Per questo motivo il modificatore `$set` risulta piuttosto utile. Secondo, `update` supporta gli `upsert` (aggiornamento oppure inserimento) in modo piuttosto intuitivo, ciò che lo rende particolarmente utile quando viene abbinato al modificatore `$inc`. Infine, per default `update` aggiorna solo il primo documento trovato.
+Questo capitolo conclude la nostra introduzione alle operazioni CRUD che è possibile eseguire su una collezione. Abbiamo visto in dettaglio il comando `update` scoprendo tre comportamenti interessanti. Primo, se passiamo a `update` il documento senza un operatore di aggiornamento, MongoDB sostituisce il documento originale. Per questo motivo normalmente va usato l'operatore `$set` (o uno dei molti altri operatori di modifica). Secondo, `update` supporta l'opzione di `upsert` (aggiornamento oppure inserimento) in modo piuttosto intuitivo, ciò che lo rende particolarmente utile quando non sappiamo se il documento esiste o meno. Infine, per default `update` aggiorna solo il primo documento trovato, quindi va usata l'opzione `multi` quando si desidera aggiornare tutti i documenti rintracciati.
 
 Tenete sempre presente che stiamo usando MongoDB dal punto di vista della sua shell. Il driver e la libreria adottata potrebbero alterare questi comportamenti predefiniti, o esporre una API differente. Il driver Ruby, per esempio, unisce gli ultimi due parametri in una singola hash: `{:upsert => false, :multi => false}`.
 
