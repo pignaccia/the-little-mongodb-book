@@ -152,11 +152,11 @@ Prima di addentrarci a fondo nei selettori prepariamo un po' di dati con cui gio
 	        gender: 'm', 
 	        vampires: 99});
 	db.unicorns.insert({name: 'Solnara', 
-	    dob: new Date(1985, 6, 4, 2, 1), 
-	    loves:['apple', 'carrot', 'chocolate'], 
-	    weight:550, 
-	    gender:'f', 
-	    vampires:80});
+	        dob: new Date(1985, 6, 4, 2, 1), 
+	        loves:['apple', 'carrot', 'chocolate'], 
+	        weight:550, 
+	        gender:'f', 
+	        vampires:80});
 	db.unicorns.insert({name: 'Ayna', 
 	        dob: new Date(1998, 2, 7, 8, 30), 
 	        loves: ['strawberry', 'lemon'], 
@@ -330,16 +330,16 @@ Tenete sempre presente che stiamo usando MongoDB dal punto di vista della sua sh
 Nel capitolo 1 abbiamo dato una veloce occhiata al comando `find`. Su `find` c'è altro da sapere; la sola comprensione dei `selettori` non è sufficiente. Abbiamo già detto che `find` restituisce un `cursore`. È giunta l'ora di andare a fondo e capire cosa ciò significa esattamente.
 
 ## Selettori di Campo ##
-Prima di passare ai `cursori` è necessario sapere che `find` accetta un secondo parametro opzionale. Si tratta dell'elenco dei campi che vogliamo recuperare. Per esempio possiamo chiedere i nomi di tutti gli unicorni con questo comando:
+Prima di passare ai `cursori` è necessario sapere che `find` accetta un secondo parametro chiamato "projection". Si tratta dell'elenco dei campi che vogliamo recuperare o escludere. Per esempio possiamo ottenere solo i nomi degli unicorni, senza nessuno degli altri campi, eseguendo:
 
-	db.unicorns.find(null, {name: 1});
+	db.unicorns.find({}, {name: 1});
 
 Per default il campo `_id` viene restituito sempre. Possiamo escluderlo in modo esplicito con `{name: 1, _id: 0}`.
 
 Ad eccezione del campo `_id`, non è possibile mescolare inclusioni ed esclusioni. A ben vedere ciò ha senso, di solito vogliamo escludere oppure includere uno o più campi esplicitamente.
 
 ## Ordinamenti ##
-Abbiamo ripetuto più volte che `find` restituisce un cursore la cui esecuzione è ritardata finché questa non si rende veramente necessaria. Tuttavia avrete senz'altro notato che nella shell `find` viene eseguito immediatamente. Questo è un comportamento peculiare della shell. Possiamo osservare il vero comportamento dei `cursori` quando usiamo uno dei metodi che è possibile concatenare a `find`. Il primo che prendiamo in esame è `sort`. `sort` funziona in maniera simile al selettore di campo che abbiamo visto nella sezione precedente. Elenchiamo i campi da ordinare, usando 1 per ottenere un ordinamento crescente e -1 per un ordinamento decrescente. Per esempio:
+Abbiamo ripetuto più volte che `find` restituisce un cursore la cui esecuzione è ritardata finché questa non si rende veramente necessaria. Tuttavia avrete senz'altro notato che nella shell `find` viene eseguito immediatamente. Questo è un comportamento peculiare della shell. Possiamo osservare il vero comportamento dei `cursori` quando usiamo uno dei metodi che è possibile concatenare a `find`. Il primo che prendiamo in esame è `sort`. Elenchiamo i campi da ordinare con un documento JSON, usando 1 per indicare un ordinamento crescente e -1 per ordinamento decrescente. Per esempio:
 
 	//gli unicorni più pesanti per primi:
 	db.unicorns.find().sort({weight: -1})
@@ -352,9 +352,12 @@ Come succede nei database relazionali, anche MongoDB è in grado di ricorrere a 
 ## Paginazione ##
 La paginazione dei risultati può essere ottenuta con i metodi cursore `limit` e `skip`. Per ottenere solo il secondo e il terzo unicorno più pesante potremmo digitare:
 
-	db.unicorns.find().sort({weight: -1}).limit(2).skip(1)
+	db.unicorns.find()
+	        .sort({weight: -1})
+	        .limit(2)
+	        .skip(1)
 
-Usare `limit` in combinazione con `sort` è un buon sistema per non incappare in problemi quando si fanno ordinamenti su campi non indicizzati.
+Usare `limit` in combinazione con `sort` può essere un modo per non incappare in problemi quando si fanno ordinamenti su campi non indicizzati.
 
 ## Conteggi ##
 La shell consente l'esecuzione di `count` direttamente sulla collezione:
@@ -363,7 +366,8 @@ La shell consente l'esecuzione di `count` direttamente sulla collezione:
 
 In realtà `count` è a sua volta un metodo `cursore`, la shell in questo caso implementa una scorciatoia. Per i driver che non implementano questa scorciatoia dovremo usare la sintassi completa (che funziona anche nella shell):
 
-	db.unicorns.find({vampires: {$gt: 50}}).count()
+	db.unicorns.find({vampires: {$gt: 50}})
+	        .count()
 
 ## Riepilogo ##
 Usare `find` e i `cursori` è piuttosto semplice. Ci sono alcuni comandi aggiuntivi che vedremo nei capitoli successivi, o che servono solo in casi rari ma, giunti a questo punto, dovreste cominciare a sentirvi a vostro agio nell'uso della shell di Mongo che nella comprensione dei principi fondamentali di MongoDB.
