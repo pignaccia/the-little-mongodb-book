@@ -375,78 +375,113 @@ Usare `find` e i `cursori` è piuttosto semplice. Ci sono alcuni comandi aggiunt
 # Capitolo 4 - Modellazione dei Dati #
 Cambiamo marcia e passiamo a un argomento più astratto che riguarda MongoDB. Spiegare qualche nuovo termine e nuove sintassi è tutto sommato un compito banale; parlare della modellazione dei dati applicata a un nuovo paradigma quale è NoSQL è tutt'altra cosa. In realtà in fatto di modellazione dati applicata a queste nuove tecnologie tutti noi siamo ancora impegnati nel tentativo di scoprire cosa funziona e cosa no. Possiamo discuterne, ma in ultima analisi dovrete far pratica e imparare lavorando sul vero codice.
 
-In confronto alla gran parte delle soluzioni NoSQL, i database orientati ai documenti sono probabilmente i meno differenti dai database relazionali. Le differenze sono sottili, ma questo non significa che non siano importanti.
+In confronto alla gran parte delle soluzioni NoSQL, i database orientati ai documenti sono probabilmente i meno differenti dai database relazionali. Le differenze, in ogni caso, sono rilevanti.
 
 ## Niente Join ##
 La prima e fondamentale differenza alla quale dovrete abituarvi è l'assenza, in MongoDB, delle join. Non conosco la ragione precisa per cui almeno qualche tipo di join non sia supportato in MongoDB ma so che, in linea generale, le join sono considerate poco scalabili. Una volta che si comincia a suddividere orizzontalmente i dati si finirà prima o poi per lanciare le join lato client (l'application server). Al di là delle spiegazioni rimane il fatto che i dati *sono* relazionali, e che MongoDB non supporta le join.
 
-Per quel che sappiamo finora, sopravvivere in un mondo senza join significa eseguirle via codice nella nostra applicazione. In pratica dobbiamo lanciare una seconda query per trovare (`find`) i dati coerenti alla nostra ricerca. Impostare la ricerca non è diverso dal dichiarare una chiave esterna in un database relazionale. Lasciamo da parte i meravigliosi unicorni e passiamo agli impiegati (`employees`). La prima cosa che facciamo è creare un impiegato (al fine di costruire esempi coerenti userò un `_id` esplicito)
+Per quel che sappiamo finora, sopravvivere in un mondo senza join significa eseguirle via codice nella nostra applicazione. In pratica dobbiamo lanciare una seconda query su un'altra collezione per trovare (`find`) i dati coerenti alla nostra ricerca. Impostare la ricerca non è diverso dal dichiarare una chiave esterna in un database relazionale. Lasciamo da parte i meravigliosi unicorni e passiamo agli impiegati (`employees`). La prima cosa che facciamo è creare un impiegato (al fine di costruire esempi coerenti userò un `_id` esplicito)
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d730"), name: 'Leto'})
+	db.employees.insert({_id: ObjectId(
+	        "4d85c7039ab0fd70a117d730"), 
+	        name: 'Leto'})
 
 Ora aggiungiamo un paio di impiegati e impostiamo `Leto` come loro manager:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d731"), name: 'Duncan', manager: ObjectId("4d85c7039ab0fd70a117d730")});
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d732"), name: 'Moneo', manager: ObjectId("4d85c7039ab0fd70a117d730")});
+	db.employees.insert({_id: ObjectId(
+	        "4d85c7039ab0fd70a117d731"), 
+	        name: 'Duncan', 
+	        manager: ObjectId(
+	        "4d85c7039ab0fd70a117d730")});
+	db.employees.insert({_id: ObjectId(
+	        "4d85c7039ab0fd70a117d732"), 
+	        name: 'Moneo', 
+	        manager: ObjectId(
+	        "4d85c7039ab0fd70a117d730")});
 
 (vale la pena ripetere che `_id` può essere un qualunque valore univoco. Poiché in una applicazione vera useremmo probabilmente un `ObjectId`, lo usiamo anche nel nostro esempio)
 
 Naturalmente per trovare tutti gli impiegati di Leto è sufficiente eseguire:
 
-	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: ObjectId(
+	        "4d85c7039ab0fd70a117d730")})
 
 Niente di speciale. La maggior parte delle volte e nel caso peggiore, l'assenza di join richiederà semplicemente l'esecuzione di una query in più (e probabilmente sarà eseguita su campi indicizzati).
 
 ## Array e Documenti Incorporati ##
 L'assenza di join non significa che MongoDB non abbia un paio di assi nella manica. Ricordate quando abbiamo detto che MongoDB supporta gli array come oggetti di prima classe del documento? Scopriamo che ciò è incredibilmente utile quando abbiamo a che fare con relazioni uno-a-molti oppure molti-a-molti. Per esempio nel caso che un impiegato possa avere due manager, potremmo memorizzarli facilmente in un array:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d733"), name: 'Siona', manager: [ObjectId("4d85c7039ab0fd70a117d730"), ObjectId("4d85c7039ab0fd70a117d732")] })
+	db.employees.insert({_id: ObjectId(
+	        "4d85c7039ab0fd70a117d733"), 
+	        name: 'Siona', 
+	        manager: [ObjectId(
+	        "4d85c7039ab0fd70a117d730"), 
+	        ObjectId(
+	        "4d85c7039ab0fd70a117d732")] })
 
 È interessante notare che per alcuni documenti `manager` può essere un valore scalare, mentre per altri può essere un array. La nostra query `find` originale funzionerà in entrambi i casi:
 
-	db.employees.find({manager: ObjectId("4d85c7039ab0fd70a117d730")})
+	db.employees.find({manager: ObjectId(
+	        "4d85c7039ab0fd70a117d730")})
 
 Scoprirete presto che gli array di valori sono molto più convenienti che non le join molti-a-molti tra più tabelle.
 
 Oltre agli array Mongo supporta i documenti incorporati. Provate a inserire un documento che a sua volta incorpori un altro documento, come per esempio:
 
-	db.employees.insert({_id: ObjectId("4d85c7039ab0fd70a117d734"), name: 'Ghanima', family: {mother: 'Chani', father: 'Paul', brother: ObjectId("4d85c7039ab0fd70a117d730")}})
+	db.employees.insert({_id: ObjectId(
+	        "4d85c7039ab0fd70a117d734"), 
+	        name: 'Ghanima', 
+	        family: {mother: 'Chani', 
+	                father: 'Paul', 
+	                brother: ObjectId(
+            "4d85c7039ab0fd70a117d730")}})
 
 Nel caso ve lo stiate chiedendo, i documenti incorporati possono essere cercati usando una notazione-a-punto:
 
-	db.employees.find({'family.mother': 'Chani'})
+	db.employees.find(
+	        {'family.mother': 'Chani'})
 
 Tratteremo brevemente il ruolo dei documenti incorporati e l'uso che se ne dovrebbe fare.
 
-## DBRef ##
-MongoDB supporta un aggeggio noto chiamato `DBRef`, che altro non è che una convenzione supportata da molti driver. Quando un driver incontra un `DBRef` può richiamare automaticamente il documento referenziato. Un `DBRef` include il nome della collezione e l'id del documento a cui fa riferimento. Di solito si usa in un caso specifico: quando documenti dalla stessa collezione possono far riferimento a documenti che appartengono a collezioni diverse l'una dall'altra. Per esempio il `DBRef` di documento1 potrebbe puntare a un documento contenuto in `managers`, mentre quello di documento2 potrebbe puntare a un documento in `employees`.
+Combinando i due concetti visti sopra possiamo incorporare anche degli array di documenti:
 
+    db.employees.insert({_id: ObjectId(
+            "4d85c7039ab0fd70a117d735"),
+            name: 'Chani',
+            family: [ {relation:'mother',name: 'Chani'},
+            {relation:'father',name: 'Paul'},
+            {relation:'brother', name: 'Duncan'}]})
 
 ## Denormalizzazione ##
 Un'altra alternativa alle join consiste nel denormalizzare i dati. In passato la denormalizzazione è sempre stata riservata alle ottimizzazioni della performance, oppure ci si ricorreva quando era necessario creare degli snapshot dei dati (come nel caso dei log di revisione). Tuttavia con la popolarità crescente dei NoSQL, molti dei quali non hanno join, la denormalizzazione come parte integrante della modellazione dei dati si sta facendo sempre più frequente. Ciò non significa che è necessario duplicare ogni informazione in ogni documento. Tuttavia, piuttosto che lasciare che la paura di duplicare dati vi guidi nel design, provate a modellare i dati basandovi su quale informazione appartiene a quale documento.
 
-Per esempio immaginate di essere al lavoro su un forum. Il modo tradizionale di associare uno specifico `user` a un `post` è per via di una colonna `userid` nella tabella `posts`. Una alternativa possibili è quella di memorizzare semplicemente sia il nome (`name`) che il `userid` in ogni `post`. Potreste usare addirittura un documento incorporato, come: `user: {id: ObjectId('Something'), name: 'Leto'}`. È vero, se consentite il cambio del nome degli utenti allora dovrete aggiornare ogni documento (il che significa una query aggiuntiva). 
+Per esempio immaginate di essere al lavoro su un forum. Il modo tradizionale di associare uno specifico `user` a un `post` è per via di una colonna `userid` nella tabella `posts`. Una alternativa possibili è quella di memorizzare semplicemente sia il nome (`name`) che il `userid` in ogni `post`. Potreste usare addirittura un documento incorporato, come: `user: {id: ObjectId('Something'), name: 'Leto'}`. È vero, se consentite che gli utenti cambino il proprio nome allora potreste dover aggiornare ogni documento (il che significa una multi-update). 
 
-Per alcuni di noi adattarsi a questo tipo di approccio non sarà una passeggiata. In molti casi non avrà effettivamente senso. Tuttavia non abbiate timore di sperimentarlo. Non solo è adattabile a diverse circostanze, ma addirittura potrebbe risultare la cosa giusta da fare.
+Per alcuni di noi adattarsi a questo tipo di approccio non sarà una passeggiata. In molti casi non avrà effettivamente senso. Tuttavia non abbiate timore di sperimentarlo. Non solo è adattabile a diverse circostanze, ma addirittura potrebbe risultare la cosa migliore da fare.
 
 ## Quale Scegliere? ##
-Gli array di id sono sempre una strategia utile quando abbiamo a che fare con scenari uno-a-molti o molti-a-molti. È probabilmente il caso di ammettere che i `DBRef` non sono usati di frequente, ma se siete senz'altro liberi giocarci un pò. I nuovi sviluppatori si domandano spesso cosa sia meglio tra documenti incorporati e riferimenti manuali.
+Gli array di id possono essere una strategia utile quando abbiamo a che fare con scenari uno-a-molti o molti-a-molti. E' frequente che i nuovi sviluppatori si domandino cosa sia meglio tra documenti incorporati e riferimenti "a mano".
 
-Prima di tutto sappiate che al momento i singoli documenti hanno un limite a 16 megabyte. Sapere che c'è un limite alla dimensione dei documenti, benché piuttosto ampio, aiuta a farsi una idea di come bisognerebbe usarli. Al momento pare che gran parte dei programmatori ricorra pesantemente ai riferimenti diretti per la maggioranza delle relazioni. I documenti incorporati sono molto usati, ma per blocchi di dati relativamente piccoli, che si vogliono sempre richiamare col documento principale. Un esempio reale che ho usato in passato è il salvataggio di un documento `accounts` per ogni utente, qualcosa tipo:
+Prima di tutto sappiate che al momento i singoli documenti hanno un limite a 16 megabyte. Sapere che c'è un limite alla dimensione dei documenti, benché piuttosto ampio, aiuta a farsi una idea di come bisognerebbe usarli. Al momento pare che gran parte dei programmatori ricorra pesantemente ai riferimenti diretti per la maggioranza delle relazioni. I documenti incorporati sono molto usati, ma per blocchi di dati relativamente piccoli, che verranno sempre richiamati assieme al documento principale. Un esempio d'uso reale potrebbe essere il salvataggio di un documento `addresses` per ogni utente, qualcosa tipo:
 
-	db.users.insert({name: 'leto', email: 'leto@dune.gov', account: {allowed_gholas: 5, spice_ration: 10}})
+	db.users.insert({name: 'leto', 
+	        email: 'leto@dune.gov', 
+	        addresses: [{street: "229 W. 43rd St",
+	                     city: "New York", state: "NY", zip: "10036"},
+                         {street: "555 University",
+                          city: "Palo Alto", state: "CA", zip: "94107"}]})
 
-Questo non significa che dovreste sottovalutare la potenza dei documenti incorporati, o derubricarli a utility di importanza secondaria. Avere un modello dati mappato direttamente sugli oggetti rende tutto molto semplice e spesso elimina la necessità di join, il che è particolarmente vero visto che MongoDB permette ricerche e indicizzazioni sui campi di un documento incorporato.
+Questo non significa che dovreste sottovalutare la potenza dei documenti incorporati, o derubricarli a utility di importanza secondaria. Avere un modello dati mappato direttamente sugli oggetti rende tutto molto semplice e spesso elimina la necessità di join, il che è particolarmente vero visto che MongoDB permette ricerche e indicizzazioni sui campi di documenti e array incorporati.
 
 ## Poche o Tante Collezioni ##
-Dato che le collezioni non impongono alcun schema è ovviamente possibile concepire un sistema con una sola collezione contenente oggetti di ogni tipo. Per quanto ho visto io la maggior parte dei sistemi MongoDB è disposto in maniera simile a quella che troviamo in un sistema relazionale. In altre parole se in un database relazione ci vorrebbe una tabella, allora è probabile in MongoDB che ci voglia una collezione (in questo caso le tabelle per relazioni molti-a-molti sono una importante eccezione).
+Dato che le collezioni non impongono alcun schema è ovviamente possibile concepire un sistema con una sola collezione contenente oggetti di ogni tipo, ma sarebbe una pessima idea. La gran parte dei sistemi MongoDB è organizzato in maniera simile a quella che troveremmo in un sistema relazionale, anche se di solito con meno collezioni. In altre parole se in un database relazione ci vorrebbe una tabella, allora c'è una buona possibilità che in MongoDB ci voglia una collezione (eccezione importante sono le tabelle create per consentire relazioni molti-a-molti, così come quelle nate solo per creare relazioni uno-a-molti con entità molto semplici).
 
-La faccenda si fa ancor più interessante prendendo in considerazione i documenti incorporati. L'esempio più usato è il blog. Dovremmo avere una collezione `posts` e una collezione `comments`, oppure dovremmo far si che ogni `post` abbia una array di `comments` incorporati? Lasciando da parte il limite dei 16MB (tutto l'Amleto è meno di 200KB, quanto è famoso il vostro blog?) la maggior parte degli sviluppatori preferiscono separare le cose. È semplicemente più limpido ed esplicito.
+La faccenda si fa ancor più interessante prendendo in considerazione i documenti incorporati. L'esempio più usato è il blog. Dovremmo avere una collezione `posts` e una collezione `comments`, oppure dovremmo far si che ogni `post` abbia una array di `comments` incorporati? Lasciando da parte il limite dei 16MB (tutto l'Amleto è meno di 200KB, quanto è famoso il vostro blog?) la maggior parte degli sviluppatori dovrebbero preferire la separazione. È semplicemente più limpido, garantisce perfomance migliori, ed è esplicito. Lo schema flessibile di MongoDB consente per altro di combinare i due approcci, mantenendo i commenti in una collezione separata ma incorporandone comunque alcuni (magari i primi) nel post, in maniera che possano venir mostrati nel blog. Questa scelta sarebbe coerente col principio di mantenere uniti i dati che si intende recuperare con una singola query.
 
 Non ci sono regole precise (a parte la faccenda dai 16MB). Giocate con i diversi approcci e capirete presto cosa ha senso e cosa non funziona nel vostro caso.
 
 ## Riepilogo ##
-In questo capitolo il nostro scopo era fornire delle linee guida utili alla modellazione dati in MongoDB. Un punto di partenza, se volete. La modellazione in un sistema orientato ai documenti è cosa diversa, ma non troppo, da quella nel mondo relazionale. C'è un pò più di flessibilità e un vincolo in più ma, per essere un nuovo sistema, le cose sembrano aggiustarsi piuttosto bene. L'unico modo di sbagliare è non provarci nemmeno.
+In questo capitolo il nostro scopo era fornire delle linee guida utili alla modellazione dati in MongoDB. Un punto di partenza, se volete. La modellazione in un sistema orientato ai documenti è cosa diversa, ma non troppo, da quella nel mondo relazionale. C'è più flessibilità e un vincolo in più ma, per essere un nuovo sistema, le cose sembrano aggiustarsi piuttosto bene. L'unico modo di sbagliare è non provarci nemmeno.
 
 # Capitolo 5 - Quando Scegliere MongoDB #
 Giunti a questo punto dovremmo conoscere Mongo abbastanza bene da intuirne il ruolo che può svolgere nel nostro sistema. Ci sono talmente tante nuove tecnologie in competizione tra loro, così tante possibilità che è facile lasciarsi intimidire. 
