@@ -547,163 +547,49 @@ Di buono c'è che esistono driver per molti linguaggi, che il protocollo è mode
 ## Riepilogo ##
 Il messaggio da cogliere da questo capitolo è che nella maggior parte dei casi MongoDB può sostituire un database relazionale. È molto più semplice e diretto; è più veloce e in generale impone meno restrizioni agli sviluppatori. La mancanza di transazioni può rivelarsi un limite significativo. Eppure, quando ci chiediamo quale sia il ruolo di MongoDB nel panorama dei nuovi sistemi di archiviazione, la riposta è semplice: **proprio nel mezzo**.
 
-# Capitolo 6 - MapReduce #
-MapReduce è un approccio all'elaborazione dati che vanta due vantaggi significativi rispetto alle altre soluzioni tradizionali. Il primo, e più importante, sono le performance. In linea teorica MapReduce può operare in parallelo elaborando grandi set di dati contemporaneamente su più core/CPU/computer. Come abbiamo già visto, però, attualmente MongoDB non è in grado di sfruttare pienamente questo aspetto. Rispetto a quel che è possibile fare con SQL, il codice di MapReduce è infinitamente più ricco e ci permette di spingerci molto avanti prima che una soluzione ancor più specializzata si renda necessaria.
+# Capitolo 6 - Aggregazione dei Dati #
+## Aggregation Pipeline ##
+La Aggregation Pipeline ci consente di trasformare e combinare i documenti di una collezione. I documenti vengono immessi in una pipeline che ricorda la "pipe" di Unix nella quale inviamo l'output di un comando ad un'altro, poi a un terzo, e così via.
 
-La popolarità del modello MapReduce è cresciuta molto, ed è ora possibile usarlo praticamente ovunque; C#, Ruby, Java, Python e così via, tutti ne offrono una implementazione. Vi avverto, all'inizio MapReduce sembrerà molto diverso da ciò a cui siete abituati, e piuttosto complicato. Non demoralizzatevi, prendetevi il tempo di sperimentare voi stessi. Vale la pena comprendere MapReduce a prescindere dal fatto che lo usiate con MongoDB o meno.
+L'aggregazione a noi più famigliare è probabilmente l'espressione SQL `group by`. Abbiamo già visto il semplice metodo `count()`, ma se volessimo scoprire quanti unicorni sono maschi e quanti, invece, femmine?
 
-## Teoria e Pratica ##
-MapReduce è un processo in due fasi. Prima si mappa (map) e poi si riduce (reduce). Il mapping trasforma i documenti del flusso di input emettendo una coppia chiave=>valore (chiave e valore possono essere complessi). La reduce prende la chiave e l'array di valori ad essa abbinati e li usa per produrre il risultato finale. Affronteremo entrambe le fasi vedendo l'output di ognuna.
+    db.unicorns.aggregate([{$group:{_id:'$gender', 
+        total: {$sum:1}}}]) 
 
-L'esempio che useremo è la generazione di un report col numero di viste (hits) giornaliere che otteniamo per una data risorsa (diciamo una pagina web). È lo *hello world* del MapReduce. Per raggiungere il nostro scopo ci affideremo a una collezione `hits` che conterrà due campi: `resource` (risorsa) e `date`. L'output che vogliamo ottenere è un elenco con le seguenti colonne:  `resource`, `year`, `month`, `day` e `count`.
+La Shell ci mette a disposizione il comando `aggregate` che accetta un array di operatori di pipeline. Per un semplice conteggio di dati raggruppati abbiamo bisogno di uno solo di questi operatori, ovvero `$group`, del tutto analogo a `GROUP BY` di SQL. Lo usiamo per creare un nuovo documento con un campo `_id` che indica quale è il campo in base al quale raggruppiamo (`gender`) e altri campi i cui valori sono di solito il risultato di una aggregazione. In questo caso aggiungiamo 1 (`$sum: 1`) per ogni documento in cui l'unicorno è del genere per il quale striamo raggruppando. Avrete notato che abbiamo usato `$gender`, e non `gender`, al campo `_id`. Il `'$'` prima del nome indica che il valore del campo proveniente dal documento verrà sostituito.
 
-Dati i seguenti contenuti di `hits`:
+Quali sono altri operatori di pipeline che possiamo usare? Il più comune oltre `$group` è probabilmente `$match`, che equivale al metodo `find` e ci consente di aggregare solo i documenti che soddisfano certi criteri o, al contrario, di escludere documenti dal risultato.
 
-	resource     date
-	index        Jan 20 2010 4:30
-	index        Jan 20 2010 5:30
-	about        Jan 20 2010 6:00
-	index        Jan 20 2010 7:00
-	about        Jan 21 2010 8:00
-	about        Jan 21 2010 8:30
-	index        Jan 21 2010 8:30
-	about        Jan 21 2010 9:00
-	index        Jan 21 2010 9:30
-	index        Jan 22 2010 5:00
+    db.unicorns.aggregate([{$match: {weight:{$lt:600}}},
+        {$group: {_id:'$gender',  total:{$sum:1},
+            avgVamp:{$avg:'$vampires'}}},
+        {$sort:{avgVamp:-1}} ])
 
-Desideriamo ottenere i seguenti risultati:
+Qui abbiamo introdotto anche l'operatore `$sort`, che fa proprio quello che vi aspettate, così come `$skip` e `$limit`. Abbiamo anche usato `$group` e `$avg` (media).
 
-	resource  year   month   day   count
-	index     2010   1       20    3
-	about     2010   1       20    1
-	about     2010   1       21    3
-	index     2010   1       21    2
-	index     2010   1       22    1
+Gli array in MongoDB sono potenti e non ci impediscono di aggregare in base ai loro contenuti. Abbiamo bisogno di "appiattirli" prima, così da poter contare qualunque loro valore:
 
-La cosa bella di questo tipo di approccio  è che, salvando l'output, i report sono veloci da generare e la crescita dei dati è controllata (per ogni risorsa che tracciamo aggiungeremo non più di 1 documento al giorno)
+    db.unicorns.aggregate([{$unwind:'$loves'},
+        {$group: {_id:'$loves',  total:{$sum:1},
+            unicorns:{$addToSet:'$name'}}},
+            {$sort:{total:-1}},
+            {$limit:1} ])
 
-Per il momento concentriamoci sul concetto. Alla fine di questo capitolo vi fornirò dati e codice di esempio da usare per fare esperimenti per conto vostro.
+Qui scopriamo quale ingrediente è il più amato dagli unicorni e otteniamo anche la lista dei nomi di tutti gli unicorni che l'adorano. `$sort` e `$limit` combinati consentono di rispondere alle classiche domande del tipo "trova i primi N elementi".
 
-Per prima cosa affrontiamo la funzione map. L'obiettivo della map è emettere un valore che può essere ridotto. È possibile che map emetta 0 o più risultati. Nel nostro caso emetterà un solo risultato (cosa che capita spesso). Immaginiamo la map come un ciclo che scorre i documenti della collezione hits. Per ogni documento vogliamo emettere una chiave con resource, year, month e day, ed un semplice valore 1:
+Esiste un altro potente operatore di pipeline chiamato [`$project`](http://docs.mongodb.org/manual/reference/operator/aggregation/project/#pipe._S_project) (analogo alle proiezioni in `find`), che consente di non includere alcuni campi o creare e calcolare nuovi campi basati sui valori di campi esistenti. Per esempio possiamo usare operatori matematici per sommare valori di più campi prima di calcolare una media, oppure possiamo usare operatori di stringa per creare un nuovo campo che è il risultato di una concatenazione di campi esistenti.
 
-	function() {
-		var key = {
-		    resource: this.resource, 
-		    year: this.date.getFullYear(), 
-		    month: this.date.getMonth(), 
-		    day: this.date.getDate()
-		};
-		emit(key, {count: 1}); 
-	}
+Abbiamo dato un'occhiata superficiale a ciò che è possibile fare con le aggregazioni. In MongoDB 2.6 le aggregazioni sono più potenti in quanto `aggregate` può restituire un cursore al set dei risultati (col quale sappiamo come operare fin dal Capitolo 1), oppure può scrivere i risultati in una nuova collezione grazie all'operatore di pipeline `$out`. Potete trovare molti più esempi e la lista degli operatori di pipeline nel [manuale di MongoDB](http://docs.mongodb.org/manual/core/aggregation-pipeline/).
 
-`this` fa riferimento al documento trattato al momento. Vedere l'output del nostro mapping agevolerà la comprensione del procedimento. Usando i dati visti sopra, l'output completo sarebbe:
+## MapReduce ##
+MapReduce è un processo in due fasi. Prima si mappa (map) e poi si riduce (reduce). Il mapping trasforma i documenti del flusso di input emettendo una coppia chiave=>valore (chiave e valore possono essere complessi). La reduce prende la chiave e l'array di valori ad essa abbinati e li usa per produrre il risultato finale. Le funziondi map e reduce sono scritte in JavaScript.
 
-	{resource: 'index', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
-	{resource: 'about', year: 2010, month: 0, day: 20} => [{count: 1}]
-	{resource: 'about', year: 2010, month: 0, day: 21} => [{count: 1}, {count: 1}, {count:1}]
-	{resource: 'index', year: 2010, month: 0, day: 21} => [{count: 1}, {count: 1}]
-	{resource: 'index', year: 2010, month: 0, day: 22} => [{count: 1}]
+In MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta una funzione map, una funzione reduce, e una direttiva di output. Nella shell possiamo creare e passare una funzione JavaScript. Alla gran parte dei driver passiamo invece una stringa che rappresenta le funzioni (il che é effettivamente brutto). Il terzo parametro imposta opzioni aggiuntive. Per esempio potremmo filtrare, ordinare o limitare i documenti che vogliamo analizzare. Possiamo anche fornire una metodo `finalize` da applicare ai risultati emessi dal `reduce`.
 
-Capire questo passagio intermedio è la chiave per comprendere MapReduce. I valori della emit sono raggruppati, in forma di array, per ogni chiave. Gli sviluppatori .NET e Java possono immaginare che si tratti di qualcosa del tipo: `IDictionary<object, IList<object>>` (.NET) oppure `HashMap<Object, ArrayList>` (Java).
-
-Cambiamo la nostra map function in modo piuttosto artificioso:
-
-	function() {
-		var key = {resource: this.resource, year: this.date.getFullYear(), month: this.date.getMonth(), day: this.date.getDate()};
-		if (this.resource == 'index' && this.date.getHours() == 4) {
-			emit(key, {count: 5});
-		} else {
-			emit(key, {count: 1}); 
-		}
-	}
-
-Il primo output intermedio cambierebbe in:
-
-	{resource: 'index', year: 2010, month: 0, day: 20} => [{count: 5}, {count: 1}, {count:1}]
-
-Notate come ogni emit genera un nuovo valore che è raggruppato in base alla nostra chiave (key).
-
-La funzione reduce prende ognuno di questi risultati intermedi e genera l'output finale. Ecco come appare la nostra funzione reduce:
-
-	function(key, values) {
-		var sum = 0;
-		values.forEach(function(value) {
-			sum += value['count'];
-		});
-		return {count: sum};
-	};
-
-Che restituisce l'output seguente:
-
-	{resource: 'index', year: 2010, month: 0, day: 20} => {count: 3}
-	{resource: 'about', year: 2010, month: 0, day: 20} => {count: 1}
-	{resource: 'about', year: 2010, month: 0, day: 21} => {count: 3}
-	{resource: 'index', year: 2010, month: 0, day: 21} => {count: 2}
-	{resource: 'index', year: 2010, month: 0, day: 22} => {count: 1}
-
-Tecnicamente, l'output in MongoDB è:
-
-	_id: {resource: 'home', year: 2010, month: 0, day: 20}, value: {count: 3}
-
-Avrete notato che questo è proprio il risultato finale che stavamo cercando.
-
-Se avete prestato attenzione vi sarete forse chiesti *perché non abbiamo usato semplicemente `sum = values.length`?* Sembrerebbe un approccio efficace visto che stiamo essenzialmente sommando un array di 1. Il fatto è che non sempre reduce è usato con un set di dati intermedi perfetti e completi. Per esempio, se invece di essere chiamato con:
-
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}, {count:1}]
-
-Reduce fosse chiamato con:
-
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 1}, {count: 1}]
-	{resource: 'home', year: 2010, month: 0, day: 20} => [{count: 2}, {count: 1}]
-
-L'ouput finale è lo stesso (3) ma il percorso fatto è, semplicemente, diverso. Per questo motivo reduce deve sempre essere idempotente, il che significa che chiamare reduce più volte dovrebbe sempre generare il risultato che si otterrebbe con una sola chiamata.
-
-Non lo faremo qui, ma è frequente concatenare metodi reduce quando si eseguono analisi più complesse.
-
-## Pratica Pura ##
-Con MongoDB usiamo il comando `mapReduce` su una collezione. `mapReduce` accetta una funzione map, una funzione reduce e una direttiva di output. Nella nostra shell possiamo creare e passare una funzione JavaScript. Con la maggior parte delle librerie potete passare una stringa che contiene le vostre funzioni (il che è piuttosto brutto). Prima di tutto creiamo il nostro semplice set di dati:
-
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 4, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 5, 30)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 20, 6, 0)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 20, 7, 0)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 8, 0)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 8, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 21, 8, 30)});
-	db.hits.insert({resource: 'about', date: new Date(2010, 0, 21, 9, 0)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 21, 9, 30)});
-	db.hits.insert({resource: 'index', date: new Date(2010, 0, 22, 5, 0)});
-
-Ora possiamo creare le nostre funzioni map e reduce (la shell MongoDB accetta comandi multi-riga, vedrete apparire *...* dopo la pressione di invio ad indicare che ci si aspetta altro testo)
-
-	var map = function() {
-		var key = {resource: this.resource, year: this.date.getFullYear(), month: this.date.getMonth(), day: this.date.getDate()};
-		emit(key, {count: 1}); 
-	};
-	
-	var reduce = function(key, values) {
-		var sum = 0;
-		values.forEach(function(value) {
-			sum += value['count'];
-		});
-		return {count: sum};
-	};
-
-Ora possiamo lanciare il comando `mapReduce` sulla nostra collezione `hits`:
-
-	db.hits.mapReduce(map, reduce, {out: {inline:1}})
-
-Eseguendo il comando qui sopra dovreste ottenere il risultato desiderato. Impostare `out` a `inline` comporta che l'output di `mapReduce` ci venga immediatamente restituito. Attualmente c'è un limite a 16 megabyte o meno per gli output di questo tipo. Potremmo invece specificare `{out: 'hit_stats'}` per inviare i risultati alla nuova collezione `hit_stats`:
-
-	db.hits.mapReduce(map, reduce, {out: 'hit_stats'});
-	db.hit_stats.find();
-
-Facendo questo eventuali dati esistenti in `hit_stats` andranno perduti. Se facessimo `{out: {merge: 'hit_stats'}}` le chiavi esistenti verrebbero aggiornate coi nuovi valori e le nuove chiavi verrebbero inserite come nuovi documenti. Potremmo infine fare `out` su una funzione `reduce` per gestire casi più avanzati (come una upsert)
-
-Il terzo parametro accetta opzioni aggiuntive, potremmo per esempio filtrare, ordinare e limitare i documenti che vogliamo analizzare. Possiamo inoltre fornire un metodo `finalize` da applciare ai risultati successivamente alla fase `reduce`.
+Probabilmente non avrete bisogno di usare MapReduce per la gran parte delle aggregazioni, ma se capitasse, potete leggere alcuni approfondimenti sul [mio blog](http://openmymind.net/2011/1/20/Understanding-Map-Reduce/) e nel [manuale di MongoDB](http://docs.mongodb.org/manual/core/aggregation-pipeline/).
 
 ## Riepilogo ##
-Questo è il primo capitolo in cui abbiamo affrontato qualcosa di veramente diverso dal solito. Se vi siete trovati a disagio, tenete presente che potete sempre ricorrere alle altre [capacità di aggregazione](http://www.mongodb.org/display/DOCS/Aggregation) offerte da MongoDB, adatte a scenari più semplici. In fin dei conti MapReduce è una delle caratteristiche più accattivanti di MongoDB. La chiave per comprendere a fondo come scrivere le vostre funzioni di map e reduce è visualizzare e comprendere l'aspetto che i dati intermedi assumeranno all'uscita della `map`, pronti per passare alla `reduce`.
+In questo capitolo abbiamo parlato delle [capacità di aggregazione](http://docs.mongodb.org/manual/aggregation/) di MongoDB. Una volta compresane la struttura la Aggregation Pipeline è relativamente semplice da usare, ed è un sistema potente per raggrupare e analizzare dati. MapReduce è più complesso ma le sua capacità sono limitate solo dal codice JavaScript che potete scrivere.
 
 # Chapter 7 - Performance e Strumenti #
 In quest'ultimo capitolo tratteremo le questioni di performance e daremo un'occhiata ad alcuni strumenti a disposizione degli sviluppatori MongoDB. Per ognuno degli argomenti esamineremo gli aspetti più importanti, senza scendere troppo nel dettaglio.
