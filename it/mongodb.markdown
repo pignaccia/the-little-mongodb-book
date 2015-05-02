@@ -591,12 +591,13 @@ Probabilmente non avrete bisogno di usare MapReduce per la gran parte delle aggr
 ## Riepilogo ##
 In questo capitolo abbiamo parlato delle [capacità di aggregazione](http://docs.mongodb.org/manual/aggregation/) di MongoDB. Una volta compresane la struttura la Aggregation Pipeline è relativamente semplice da usare, ed è un sistema potente per raggrupare e analizzare dati. MapReduce è più complesso ma le sua capacità sono limitate solo dal codice JavaScript che potete scrivere.
 
-# Chapter 7 - Performance e Strumenti #
+# Capitolo 7 - Performance e Strumenti #
 In quest'ultimo capitolo tratteremo le questioni di performance e daremo un'occhiata ad alcuni strumenti a disposizione degli sviluppatori MongoDB. Per ognuno degli argomenti esamineremo gli aspetti più importanti, senza scendere troppo nel dettaglio.
 
 ## Indici ##
 All'inizio del libro abbiamo incontrato la collezione speciale `system.indexes` che contiene informazioni su tutti gli indici del nostro database. Gli indici in MongoDB funzionano in maniera molto simile a quella dei database relazionali: migliorano le performance di ricerche e ordinamenti. Gli indici vengono creati con `ensureIndex`:
 
+    // "name" è il mome del campo
 	db.unicorns.ensureIndex({name: 1});
 
 E cancellati con `dropIndex`:
@@ -605,15 +606,17 @@ E cancellati con `dropIndex`:
 
 Un indice univoco si crea passando un secondo parametro e impostando `unique` a `true`:
 
-	db.unicorns.ensureIndex({name: 1}, {unique: true});
+	db.unicorns.ensureIndex({name: 1}, 
+	    {unique: true});
 
 Gli indici possono venire creati su campi incorporati (ancora una volta ricorrendo alla notazione col punto) e sugli array. È anche possibile creare indici compositi:
 
-	db.unicorns.ensureIndex({name: 1, vampires: -1});
+	db.unicorns.ensureIndex({name: 1, 
+	    vampires: -1});
 
-L'ordine dell'indice (1 per ascendente, -1 per discendente) non importa per gli indici singoli, ma può avere un impatto sugli indici compositi, quando si combinano condizioni di range (gamma) e ordinamenti.
+La direzione dell'indice (1 ascendente, -1 discendente) non ha importanza per gli indici singoli, ma può fare la differenza per gli indici composti quando si ordina su più di un campo per volta.
 
-Maggiori informazioni sugli indici sono reperibili sulla [pagina sugli indici](http://www.mongodb.org/display/DOCS/Indexes) del sito ufficiale.
+Maggiori informazioni sono reperibili sulla [pagina ufficiali dedicata agli indici](http://docs.mongodb.org/manual/indexes/) del sito ufficiale.
 
 ## Explain ##
 Per capire se le nostre query stanno usando un indice possiamo ricorrere al metodo `explain` applicato a un cursore:
@@ -626,27 +629,19 @@ Se facciamo in modo che la nostra query ricorra a un indice scopriremo che è st
 
 	db.unicorns.find({name: 'Pilot'}).explain()
 
-## Scritture 'Fire and Forget' ##
-Abbiamo già detto prima che, per default, le write in MongoDB sono del tipo fire-and-forget. Questo comporta un miglioramento delle performance al costo di un aumento del rischio di perdita dati in caso di crash. Un effetto interessante di questo tipo di approccio alla scrittura dati è che non viene restituito alcun errore quando una insert/update finisce per violare un vincolo di univocità. Per informarci sugli eventuali errori di scrittura dobbiamo chiamare esplicitamente il metodo `db.getLastError()` dopo una insert. Molti driver astraggono questo dettaglio gestendolo internamente, e forniscono un metodo diretto per lanciare scritture *sicure* - spesso ricorrendo a un parametro extra. 
-
-Sfortunamente la shell esegue automaticamente delle scritture sicure, pertanto non possiamo vedere facilmente questo comportamento in azione.
+## Replicazione ##
+La replicazione in MongoDB funziona in modo simile a quella dei database relazionali. Tutti i sistemi in produzione dovrebbero essere dei replica set, che idealmente consistono in tre o più server che contengono li stessi dati. Le scritture sono inviate a un singolo server, il primario, dal quale vengono replicate on modo asincrono ai secondari. E' possibile decidere se consentire o meno la lettura dai server secondari, cosa che può tornare utile per evitare che tutte le query vadano sul primario, con il rischio però di leggere dati leggermente obsoleti. Se il primario cade, uno dei secondari verrà automaticamente eletto e diventerà il nuovo primario. La replicazione in MongoDB non è trattata in questo libro.
 
 ## Sharding ##
 MongoDB supporta l'auto-sharding. Lo sharding è un approccio alla scalabilità che ripartisce i dati su server multipli. Una implementazone banale potrebbe salvare tutti i dati degli utenti con nome che comincia per A-M sul server 1, e il resto sul server 2. Per fortuna le capacità di sharding di MongoDB sono nettamente superiori. L'argomento Sharding è ben al di là degli scopi di questo libro, ma sappiate che esiste e che dovreste considerarlo nel caso le vostre necessità vadano oltre il singolo server.
 
-## Replicazione ##
-La replicazione in MongoDB funziona in modo simile a quella dei database relazionali. Le scritture vengono inviate a un singolo server, il master, che in seguito si sincronizza con uno o più server, gli slave. Possiamo controllare se le letture possono avvenire o meno sugli slave, il che ci può aiutare a distribuire il carico di lavoro correndo però il rischio di leggere dati leggermente obsoleti. Se il master fallisce, uno slave può venir promosso al ruolo di master. Anche la replication è al di là degli scopi di questo libro.
-
-È vero che la replication può migliorare le performance (distribuendo le letture), ma il suo scopo principale è migliorare l'affidabilità. Combinare replication e sharding è un approccio molto diffuso. Per esempio, ogni shard potrebbe essere configurato con un master e uno slave. (Tecnicamente ci sarà anche bisogno di un arbitro per decidere chi promuovere nel caso di due slave che tentano entrambi di diventare master. Ma un arbitro richiede poche risorse e può essere usato per più shard.)
+La replicazione può aiutare le perfomance in qualche modo (relegando le query più lente ai secondari, e riducendo la latenza delle altre), ma il suo scopo è garantire la disponibilità dei dati. Sharding serve a ottenere scalabilità dei cluster MongoDB. La combinazione di replicazione e sharding è l'ideale per ottenere sia disponibilità che scalabilità dei dati.
 
 ## Statistiche ##
-Possiamo ottenere informazioni su un database digitando `db.stats()`. Gran parte delle informazioni riguardano le dimensioni del database. Possiamo anche ottenere informazioni su una collezione, per esempio `unicorns`, digitando `db.unicorns.stats()`. Anche in questo caso le informazioni riguardano più che altro le dimensioni della nostra collezione.
-
-## Intefaccia Web ##
-Tra le informazioni disponibili quando abbiamo lanciato MongoDB c'era un link a uno strumento amministrativo su web (potrebbe essere ancora visibile se fate scorrere la finestra di comando/terminale fino al punto in cui avete lanciato `mongod`). Lo strumento amministrativo è accessibile puntando il browser all'indirizzo <http://localhost:28017/>. Varrà la pena aggiungere `rest=true` al config e riavviare il processo `mongod`. L'interfaccia web fornisce molte informazioni sullo stato del server.
+Possiamo ottenere informazioni su un database digitando `db.stats()`. Gran parte delle informazioni riguardano le dimensioni del database. Possiamo anche ottenere informazioni su una collezione, per esempio `unicorns`, digitando `db.unicorns.stats()`. Anche in questo caso le informazioni riguardano più che altro le dimensioni della collezione.
 
 ## Profiler ##
-Possiamo attivare il profiler di MongoDB eseguendo:
+Attiviamo il profiler di MongoDB eseguendo:
 
 	db.setProfilingLevel(2);
 
@@ -660,13 +655,14 @@ Quindi esaminare il profiler:
 
 L'output ci dirà che cosa è stato eseguito e quando, quanti documenti sono stati considerati e quanti dati sono stati effettivamente restituiti.
 
-Il profiler si disattiva chiamando di nuovo `setProfileLevel` ma questa volta impostando l'argomento a `0`. Un'altra opzione è specificare `1`, che profilerà solo le query che richiedono più di 100 millisecondi. Oppure possiamo specificare il tempo minimo, in millisecondi, ricorrendo a un secondo parametro:
+Il profiler si disattiva chiamando di nuovo `setProfileLevel` impostando il parametro a `0`. Specificando `1` profilerà solo le query che richiedono più di 100 millisecondi. 100 millisecondi è il valore di default, ma è possibile impostare un limite diverso, in millisecondi, passando un secondo parametro:
 
-	//profile per qualunque cosa che impieghi più di 1 secondo
+	//profile per qualunque cosa che impieghi 
+	//più di 1 secondo
 	db.setProfilingLevel(1, 1000);
 
 ## Backup e Restore ##
-Nella cartella `bin` di MongoDB c'è l'eseguibile `mongodump`. Semplicemente lanciandolo, `mongodump` si connette al localhost ed esegue il backup dei database in una sotto-cartella `dump`. Possiamo digitare `mongodump --help` per scoprire le opzioni aggiuntive. Le più comuni sono `--db NOME` per fare il backup di uno specifico database e `-- collection NOMECOLLEZIONE` per fare il backup di una certa collezione. Successivamente potremo ricorrere all'eseguibile `mongorestore`, sempre nella cartella `bin`, per ripristinare un backup precedente. Anche in questo caso potremo usare `--db` e `--collection` per ripristinare database o collezione specifici.
+Nella cartella `bin` di MongoDB c'è l'eseguibile `mongodump`. Semplicemente lanciandolo `mongodump` si connette al localhost ed esegue il backup dei database in una sottocartella `dump`. Possiamo digitare `mongodump --help` per scoprire le opzioni aggiuntive. Le più comuni sono `--db NOME` per fare il backup di uno specifico database e `-- collection NOMECOLLEZIONE` per fare il backup di una certa collezione. Possiamo poi ricorrere a `mongorestore`, sempre nella cartella `bin`, per ripristinare un backup precedente. Anche in questo caso potremo usare `--db` e `--collection` per ripristinare database o collezione specifici. Sia `mongodump` che `mongorestore` operano sul BSONl che è il formato nativo di MongoDB.
 
 Per esempio se volessimo eseguire il backup della collezione `learn` in una cartella `backup`, dovremmo eseguire (questi sono programmi indipendenti, non funzioneranno dall'interno della shell di mongo):
 
@@ -674,22 +670,25 @@ Per esempio se volessimo eseguire il backup della collezione `learn` in una cart
 
 Per ripristinare solo la collezione `unicorns` potremmo eseguire:
 
-	mongorestore --collection unicorns backup/learn/unicorns.bson
+	mongorestore --collection unicorns \
+	    backup/learn/unicorns.bson
 
 Vale la pena ricordare che `mongoexport` e `mongoimport` sono altri due programmi che possono essere usati per esportare e importare dati da JSON o CSV. Per esempio possiamo ottenere un output JSON eseguendo:
 
-	mongoexport --db learn -collection unicorns
+	mongoexport --db learn --collection unicorns
 
 E un output CSV eseguendo:
 
-	mongoexport --db learn -collection unicorns --csv -fields name,weight,vampires
+	mongoexport --db learn \
+	    --collection unicorns \
+	    --csv -fields name,weight,vampires
 
-Tenete presente che `mongoexport` e `mongoimport` non sono sempre in grado di rappresentare i dati. Solo `mongodump` e `mongorestore` dovrebbero essere usati per ottenere dei veri backup.
+Tenete presente che `mongoexport` e `mongoimport` non sono sempre in grado di rappresentare correttamente i dati. Solo `mongodump` e `mongorestore` dovrebbero essere usati per lavorare con dei veri e propri backup. Potete approfondire l'argomento leggendo la [sezione dedicata ai backup](http://docs.mongodb.org/manual/core/backups/) del manuale ufficiale.
 
 ## Riepilogo ##
 In questo capitolo abbiamo scoperto vari comandi, strumenti e alcuni dettagli relativi alle performance di MongoDB. Non abbiamo visto tutto, ci siamo limitati a quelli usati più spesso. L'indicizzazione in MongoDB è simile a quella dei database relazionali, così come molti degli altri strumenti. In MongoDB, tuttavia, molti di questi strumenti sono davvero facili da usare.
 
 # Conclusione #
-Ora dovreste essere in possesso di informazioni sufficienti per usare MongoDB in un progetto reale. In MongoDB c'è più di quel che abbiamo trattato, ma giunti a questo punto la vostra priorità è mettere a frutto quel che avete imparato e acquisire familiarità col driver che userete. Il [sito MongoDB](http://www.mongodb.com/) è ricco di informazioni utili e il [MongoDB user group ufficiale](http://groups.google.com/group/mongodb-user) è il posto ideale dove porre le vostre domande.
+Ora dovreste essere in possesso di informazioni sufficienti per usare MongoDB in un progetto reale. In MongoDB c'è più di quel che abbiamo trattato, ma giunti a questo punto la vostra priorità è mettere a frutto quel che avete imparato e acquisire familiarità col driver che userete. Il [sito MongoDB](http://www.mongodb.org/) è ricco di informazioni utili e il [MongoDB user group ufficiale](http://groups.google.com/group/mongodb-user) è il posto ideale dove porre domande.
 
 NoSQL è nato non solo per necessità ma anche dall'interesse genuino verso la sperimentazione di nuovi approcci. È risaputo quanto il nostro settore sia in continua evoluzione e che, se non tentiamo, a volte anche fallendo, non otterremo alcun successo. Credo che questo sia un buon approccio per condurre la nostra vita professionale.
