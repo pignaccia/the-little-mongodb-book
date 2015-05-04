@@ -21,7 +21,7 @@ it/mongodb.pdf:
 
 en/mongodb.epub: en/title.png en/title.txt en/mongodb.markdown
 	$(EPUB_BUILDER) $(EPUB_BUILDER_FLAGS) $^ -o $@
-it/mongodb.epub: it/title.png en/title.txt it/mongodb.markdown
+it/mongodb.epub: it/title.png it/title.txt it/mongodb.markdown
 	$(EPUB_BUILDER) $(EPUB_BUILDER_FLAGS) $^ -o $@
 
 en/mongodb.mobi: en/mongodb.epub
