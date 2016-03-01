@@ -27,7 +27,7 @@ Le ultime versioni PDF, ePub e mobi sono invece reperibili qui:
 <http://nicolaiarocci.com/il-piccolo-libro-di-mongodb-edizione-italiana/>.
 
 ## Traduzione italiana ##
-Traduzione della prima e seconda edizione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca, David Gervasoni, Emiliano Bovetti.
+Traduzione della prima e seconda edizione a cura di [Nicola Iarocci](http://nicolaiarocci.com) (http://nicolaiarocci.com). Collaboratori: Andrea Rabbaglietti, Michele Zonca, David Gervasoni, Emiliano Bovetti, Davide Bozza.
 
 Vi prego di segnalare ogni errore o imprecisione, così da migliorare nel tempo la qualità del testo.
 
@@ -222,9 +222,9 @@ restituisce qualunque unicorno che ami (love) mele (apple) o arance (orange).
 
 Se vogliamo un OR piuttosto che un AND tra diverse condizioni su campi diversi, allora usiamo l'operatore `$or` assegnandoli un array di selettori che vogliamo esclusivi:
 
-    db.unicorns.find({gender: 'f',}
+    db.unicorns.find({gender: 'f',
             $or: [{loves: 'apple'},
-                {weight: {$lt: 500}}])
+                {weight: {$lt: 500}}]})
 
 L'istruzione precedente restituirà tutti gli unicorni femmina che amano mangiare pere oppure pesano meno di 500.
 
