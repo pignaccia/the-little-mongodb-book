@@ -226,7 +226,7 @@ Se vogliamo un OR piuttosto che un AND tra diverse condizioni su campi diversi, 
             $or: [{loves: 'apple'},
                 {weight: {$lt: 500}}]})
 
-L'istruzione precedente restituirà tutti gli unicorni femmina che amano mangiare pere oppure pesano meno di 500.
+L'istruzione precedente restituirà tutti gli unicorni femmina che amano mangiare mele oppure pesano meno di 500.
 
 Nell'ultimo esempio succede qualcosa di interessante. Forse avrete notato che il campo `loves` è un array. MongoDB supporta gli array come oggetti di prima classe. Questa è una caratteristica incredibilmente utile. Una volta cominciato ad usarla ti domanderai come hai potuto vivere senza finora. Ciò che è ancor più interessante è quanto sia facile fare selezioni basate su valori di array: `{loves: 'watermelon'}` restituisce qualunque documento che abbia campi 'loves' valorizzati a 'watermelon'.
 
